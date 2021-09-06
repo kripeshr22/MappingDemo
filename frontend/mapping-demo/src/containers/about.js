@@ -9,11 +9,11 @@ const About = () => {
             <div className="card">
             <p class="answer">This website is part of a project by HMC TechEquity Collaboartive Clinic 21' Team.</p>
             <p>
-                <li><a href="https://github.com/annadsinger0" class="answer">Anna Singer</a></li>
-                <li><a href="https://github.com/arunramakrishna" class="answer">Arun Ramakrishna</a></li>
-                <li><a href="https://github.com/mariesateo" class="answer">Mariesa Teo</a></li>
-                <li><a href="https://github.com/kripeshr22" class="answer">Kripesh Ranabhat</a></li>
-                <li><a href="https://github.com/yurynamgung" class="answer">Yury Namgung</a></li></p>
+                <li><a href="https://github.com/annadsinger0" class="answer" target='_blank'>Anna Singer</a></li>
+                <li><a href="https://github.com/arunramakrishna" class="answer" target='_blank'>Arun Ramakrishna</a></li>
+                <li><a href="https://github.com/mariesateo" class="answer" target='_blank'>Mariesa Teo</a></li>
+                <li><a href="https://github.com/kripeshr22" class="answer" target='_blank'>Kripesh Ranabhat</a></li>
+                <li><a href="https://github.com/yurynamgung" class="answer" target='_blank'>Yury Namgung</a></li></p>
             <br/>
             <a href="https://github.com/kripeshr22/MappingDemo">GITHUB</a>
             </div>
