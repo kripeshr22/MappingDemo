@@ -1,20 +1,37 @@
 
-import React from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import "../styles/main.css"
 import "../styles/home.css"
-import logo from '../logo.svg';
+import mapboxgl from 'mapbox-gl';
+import About from './about';
+
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const Home = () => {
+    const mapContainer = useRef(null);
+    useEffect(() => {
+        const map = new mapboxgl.Map({
+          container: mapContainer.current,
+          // See style options here: https://docs.mapbox.com/api/maps/#styles
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [-118.2437, 34.0522],
+          zoom: 12.5,
+        });
+        map.on('load', function() {
+            map.resize()
+        });
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-        return <div className = "home">
-            <div className ="block">
-            <h1>
-                SOME MAP WILL TAKE THIS OVER!
-            </h1>
-            <p>Under construction!</p>
-            <img src={logo} className="App-logo" alt="logo" />
-            </div>
+    // clean up on unmount
+    return () => map.remove();
+  }, []); 
+        return (
+            <div>
+                <h1 className="header">SOME MAP </h1>
+            <div className="map">
+        <div className="map-container" ref={mapContainer} />
         </div>
+        </div>)
 }
 
 export default Home;

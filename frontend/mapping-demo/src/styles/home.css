@@ -28,3 +28,24 @@
         transform: rotate(360deg);
     }
     }
+
+    .header {
+      color: white;
+      text-align: center;
+    }
+
+    .map {
+      position: relative;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 600px;
+      width: 600px;
+      justify-content: center;
+  }
+  
+  .map-container {
+      position: relative;
+      height: inherit;
+      width: inherit;
+  }
