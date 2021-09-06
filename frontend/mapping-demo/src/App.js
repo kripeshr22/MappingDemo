@@ -7,10 +7,6 @@ import About from './containers/about'
 import NavigationBar from './components/nav_bar'
 import { Route, Redirect, Switch, HashRouter } from 'react-router-dom'
 
-import mapboxgl from 'mapbox-gl';
-
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-
 function App() {
   return (
     <div className ="app">
