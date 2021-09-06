@@ -1,9 +1,8 @@
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect} from 'react'
 import "../styles/main.css"
 import "../styles/home.css"
 import mapboxgl from 'mapbox-gl';
-import About from './about';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
