@@ -7,6 +7,7 @@ import About from './containers/about'
 import NavigationBar from './components/nav_bar'
 import { Route, Redirect, Switch, HashRouter } from 'react-router-dom'
 
+
 function App() {
   return (
     <div className ="app">
