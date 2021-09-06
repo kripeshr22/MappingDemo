@@ -2,6 +2,8 @@
 
 A demo model for what is going to be a web app that hosts an interactive map with a lot of data in it. 
 
+[https://demomaptech.netlify.app](https://demomaptech.netlify.app)
+
 Contributors:
 * [Anna Singer](https://github.com/annadsinger0) **(PM)**
 * [Arun Ramakrishna](https://github.com/arunramakrishna)
