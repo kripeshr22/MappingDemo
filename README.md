@@ -2,12 +2,6 @@
 
 A demo model for what is going to be a web app that hosts an interactive map with a lot of data in it. 
 
-## How to install this repo and run it on your local device
-1. [Install NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-2. Clone this repo: `git clone https://github.com/kripeshr22/MappingDemo.git`
-3. Run `npm install`
-4. Run `npm start`
-
 [https://demomaptech.netlify.app](https://demomaptech.netlify.app)
 
 Contributors:
@@ -17,3 +11,8 @@ Contributors:
 * [Kripesh Ranabhat](https://github.com/kripeshr22)
 * [Yury Namgung](https://github.com/yurynamgung)
 
+## How to install this repo and run it on your local device
+1. [Install NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+2. Clone this repo: `git clone https://github.com/kripeshr22/MappingDemo.git`
+3. Run `npm install`
+4. Run `npm start`
