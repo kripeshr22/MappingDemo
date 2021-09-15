@@ -16,6 +16,7 @@ class NavigationBar extends React.Component {
                 <ul>
                     <li><NavLink to="/home" activeStyle={active}>Home</NavLink></li>
                     <li><NavLink to="/about" activeStyle={active}>About</NavLink></li>
+                    <li><NavLink to="/map2" activeStyle={active}>Map2</NavLink></li>
                 </ul>
             </div>
         )

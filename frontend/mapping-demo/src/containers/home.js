@@ -2,11 +2,11 @@
 import React, { useRef, useEffect} from 'react'
 import "../styles/main.css"
 import "../styles/home.css"
+
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import mapboxgl from "!mapbox-gl";
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3JpcGVzaHIiLCJhIjoiY2t0OHg0MDMwMTZzaTJvcTJjYnlvZGFmaCJ9.Dfgb6MDEBqbvraywys_j9g';
-
 const Home = () => {
     const mapContainer = useRef(null);
     useEffect(() => {
@@ -20,7 +20,15 @@ const Home = () => {
         map.on('load', function() {
             map.resize()
         });
-        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
+            `
+            );
+        const marker = new mapboxgl.Marker()
+            .setLngLat([-118.3581, 34.0722])
+            .addTo(map)
+            .setPopup(popup);
 
     // clean up on unmount
     return () => map.remove();
