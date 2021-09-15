@@ -25,10 +25,10 @@ const Home = () => {
             ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
             `
             );
-        const marker = new mapboxgl.Marker()
+        map.addControl(new mapboxgl.Marker()
             .setLngLat([-118.3581, 34.0722])
             .addTo(map)
-            .setPopup(popup);
+            .setPopup(popup));
 
     // clean up on unmount
     return () => map.remove();
