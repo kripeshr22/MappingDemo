@@ -13,7 +13,7 @@ data = json.loads(response.read())
 
 # ***** connect to the db *******
 try:
-    conn = psycopg2.connect(database='parcelDatabase', user='yurynamgung', password='mtbok2')
+    conn = psycopg2.connect(database='parceldatabase', user='techequity', password='clinic')
     print("successfully connected to database")
 except:
     print("I am unable to connect to the database")
