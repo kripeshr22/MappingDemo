@@ -1,22 +1,20 @@
-import json, urllib.request, requests
 import psycopg2
-from psycopg2.extras import execute_values
-from requests import api
 from create_table import create_table_query
-import pandas as pd
 from sodapy import Socrata
-import itertools
 
 # ***** connect to the db and api *******
+
+# tech equity app token for socrata api access
 client = Socrata(
     "data.lacounty.gov",
-    None,
+    app_token='8uMOnLx6S823qlm58la47e6Pd',
     timeout=100
 )
 
+# updated to standard-0 heroku db
 try:
-    conn = psycopg2.connect(host='ec2-34-194-123-31.compute-1.amazonaws.com', database='dfvq9ek4f004sj', port=5432,
-                            user='nuqphmmgbdaxdi', password='ac659eafc14bad6a7c8d451e575d72c8b634f92b9ef09857af54633cebbc64b8')
+    conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+                            user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
     print("successfully connected to database")
 except:
     print("I am unable to connect to the database")
@@ -92,20 +90,17 @@ data = client.get_all(
 print("successfully got data from api endpoint")
 
 for row in data:
-    # insert missing keys
-    for f in fields:
-        if f not in row:
-            row[f] = ""
-
     # insert into table
-    my_data = [row[field] for field in fields]
+    my_data = [row.get(field, "") for field in fields]
     insert_query = "INSERT INTO rawParcelTable VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    cur.execute(insert_query, tuple(my_data))
+
+    # -- uncomment line to show error message -- 
+    cur.execute(insert_query, tuple(my_data)) 
 
     # try: 
     #     cur.execute(insert_query, tuple(my_data))
     # except:
-    #     print(my_data)
+    #     print(my_data) # show problem row, prevent error message
     #     break
     conn.commit()
 
