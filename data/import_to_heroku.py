@@ -1,6 +1,8 @@
+from pandas.core import groupby
 import psycopg2
 from create_table import create_table_query
 from sodapy import Socrata
+import pandas as pd
 
 # ***** connect to the db and api *******
 
@@ -24,10 +26,12 @@ cur = conn.cursor()
 
 
 # all columns
+
+# just getting land values for now -> will add in improvement value later
 fields = [
     'situszip', 
     # 'taxratearea_city', 
-    'ain', 
+    # 'ain', 
     'rollyear', 
     # 'taxratearea', 
     # 'assessorid', 
@@ -47,20 +51,20 @@ fields = [
     # 'units', 
     # 'recordingdate', 
     'roll_landvalue', 
-    'roll_landbaseyear', 
-    'roll_impvalue', 
-    'roll_impbaseyear',
-    'roll_totlandimp', 
+    'roll_landbaseyear',  # this gets updated when change in ownership
+    # 'roll_impvalue', 
+    # 'roll_impbaseyear',
+    # 'roll_totlandimp', 
     # 'roll_homeownersexemp', 
     # 'roll_realestateexemp', 
     # 'roll_fixturevalue', 
     # 'roll_fixtureexemp', 
     # 'roll_perspropvalue', 
     # 'roll_perspropexemp', 
-    'istaxableparcel', 
-    'roll_totalvalue', 
+    # 'istaxableparcel', 
+    # 'roll_totalvalue', 
     # 'roll_totalexemption', 
-    'nettaxablevalue', 
+    # 'nettaxablevalue', 
     # 'parcelclassification', 
     # 'adminregion', 
     # 'cluster', 
@@ -72,7 +76,7 @@ fields = [
     # 'situsunit', 
     # 'situscity', 
     # 'situszip5', 
-    'rowid', 
+    # 'rowid', 
     'center_lat', 
     'center_lon',
     # 'location_1',
@@ -83,11 +87,30 @@ cur.execute("DROP TABLE IF EXISTS rawParcelTable")
 cur.execute(create_table_query)
 print("created table. connecting to api")
 
+
 # Retrieve Json Data from API endpoint
 cols_as_string = ", ".join(fields)
-data = client.get_all(
-    '9trm-uz8i', select=cols_as_string, usecodedescchar1="Commercial", istaxableparcel="Y")
-print("successfully got data from api endpoint")
+query = "SELECT DISTINCT ON (ain) " + cols_as_string + \
+    "ORDER BY `rollyear` DESC"
+
+data_generator = client.get_all('9trm-uz8i', select="distinct ain, " + cols_as_string, usecodedescchar1="Commercial",
+    istaxableparcel="Y", order="rollyear DESC")
+
+print("successfully got data generator from api endpoint")
+print(type(data_generator))
+
+# counter = 0
+# for r in data_generator:
+#     if counter == 10:
+#         break
+#     counter = counter + 1
+#     print(r)
+
+
+# df = pd.DataFrame.from_records(data)
+# df = df.sort_values(['ain','rollyear'],ascending=False)
+# df = df.groupby('ain').ffill().drop_duplicates('ain', keep='first')
+# print(df.head(10))
 
 for row in data:
     # insert into table
