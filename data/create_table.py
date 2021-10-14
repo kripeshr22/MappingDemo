@@ -1,7 +1,7 @@
 # script to make a table w correct schema in postgresql database
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
-create_table_query = "CREATE TABLE IF NOT EXISTS rawParcelTable ( \
+create_table_query = "CREATE UNLOGGED TABLE IF NOT EXISTS rawParcelTable ( \
     ain VARCHAR(15) PRIMARY KEY, \
     situszip VARCHAR(20), \
     rollyear VARCHAR(5) NOT NULL, \
