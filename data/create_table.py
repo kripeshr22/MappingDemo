@@ -2,8 +2,8 @@
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 create_table_query = "CREATE TABLE IF NOT EXISTS rawParcelTable ( \
-    situszip VARCHAR(20), \
     ain VARCHAR(15) PRIMARY KEY, \
+    situszip VARCHAR(20), \
     rollyear VARCHAR(5) NOT NULL, \
     usecodedescchar1 VARCHAR(20) NOT NULL,\
     sqftmain VARCHAR(10), \

@@ -112,7 +112,7 @@ print(type(data_generator))
 # df = df.groupby('ain').ffill().drop_duplicates('ain', keep='first')
 # print(df.head(10))
 
-for row in data:
+for row in data_generator:
     # insert into table
     my_data = [row.get(field, "") for field in fields]
     insert_query = "INSERT INTO rawParcelTable VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
