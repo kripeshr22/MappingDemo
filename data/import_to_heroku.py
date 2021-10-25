@@ -134,3 +134,40 @@ def import_to_heroku():
 
     # close the connection
     conn.close()
+
+
+def clean_parcelData():
+    #modeled after https://www.postgresqltutorial.com/postgresql-python/delete/
+    conn = None
+    #we can keep track of how many rows we're deleting 
+    # to see if our cleaning method is helpful
+    try:
+
+        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+                                user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
+        cur = conn.cursor()
+        #deleting rows based on anna's work
+        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType != Commercial")
+        cur.execute("DELETE FROM rawParcelData WHERE isTaxableParcel? = N")
+        cur.execute("DELETE FROM rawParcelData WHERE ZIPcode5 = null")
+        cur.execute("DELETE FROM rawParcelData WHERE RollYear = null")
+        cur.execute("DELETE FROM rawParcelData WHERE LandBaseYear = null")
+        cur.execute("DELETE FROM rawParcelData WHERE LandValue = null")
+        cur.execute("DELETE FROM rawParcelData WHERE SQFTmain = 0")
+        cur.execute("DELETE FROM rawParcelData WHERE rowID = null")
+        cur.execute("DELETE FROM rawParcelData WHERE Location 1 = (0.0°, 0.0°)")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LON = 0")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT = 0")
+
+        #updating our number of deleted rows based on what we removed
+        deletedRows = cur.rowcount
+        #save changes to the database
+        conn.commit()
+        #close cursor
+        cur.close()
+    except:
+        print("I am unable to connect to the database")
+    finally:
+        #close connection to heroku
+        conn.close()
+    return deletedRows
