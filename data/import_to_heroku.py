@@ -146,7 +146,7 @@ def clean_parcelData():
         conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         cur = conn.cursor()
-        #deleting rows based on anna's work
+        #deleting rows based on anna's work 
         cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType = 'Residential' ")
         cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType is null")
         cur.execute("DELETE FROM rawParcelData WHERE isTaxableParcel? = 'N' ")
