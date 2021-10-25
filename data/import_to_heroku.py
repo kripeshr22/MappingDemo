@@ -147,17 +147,21 @@ def clean_parcelData():
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         cur = conn.cursor()
         #deleting rows based on anna's work
-        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType != Commercial")
-        cur.execute("DELETE FROM rawParcelData WHERE isTaxableParcel? = N")
-        cur.execute("DELETE FROM rawParcelData WHERE ZIPcode5 = null")
-        cur.execute("DELETE FROM rawParcelData WHERE RollYear = null")
-        cur.execute("DELETE FROM rawParcelData WHERE LandBaseYear = null")
-        cur.execute("DELETE FROM rawParcelData WHERE LandValue = null")
-        cur.execute("DELETE FROM rawParcelData WHERE SQFTmain = 0")
-        cur.execute("DELETE FROM rawParcelData WHERE rowID = null")
-        cur.execute("DELETE FROM rawParcelData WHERE Location 1 = (0.0°, 0.0°)")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LON = 0")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT = 0")
+        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType = 'Residential' ")
+        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType is null")
+        cur.execute("DELETE FROM rawParcelData WHERE isTaxableParcel? = 'N' ")
+        cur.execute("DELETE FROM rawParcelData WHERE ZIPcode5 is null")
+        cur.execute("DELETE FROM rawParcelData WHERE RollYear is null")
+        cur.execute("DELETE FROM rawParcelData WHERE LandBaseYear is null")
+        cur.execute("DELETE FROM rawParcelData WHERE LandValue is null")
+        cur.execute("DELETE FROM rawParcelData WHERE SQFTmain = '0' ")
+        cur.execute("DELETE FROM rawParcelData WHERE rowID is null")
+        cur.execute("DELETE FROM rawParcelData WHERE Location 1 = '(0.0°, 0.0°)'")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LON = '0'")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT = '0'")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
+        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
+
 
         #updating our number of deleted rows based on what we removed
         deletedRows = cur.rowcount
