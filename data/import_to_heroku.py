@@ -161,6 +161,18 @@ def clean_parcelData():
         cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT = '0'")
         cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
         cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
+        cur.execute("UPDATE “laCountyData2” SET sqftmain = REPLACE(sqftmain, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_landvalue = REPLACE(roll_landvalue, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_impvalue = REPLACE(roll_impvalue, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_totlandimp = REPLACE(roll_totlandimp, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_realestateexemp = REPLACE(roll_realestateexemp, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_fixturevalue = REPLACE(roll_fixturevalue, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_fixtureexemp = REPLACE(roll_fixtureexemp, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_perspropvalue = REPLACE(roll_perspropvalue, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_perspropexemp = REPLACE(roll_perspropexemp, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_totalvalue = REPLACE(roll_totalvalue, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET roll_totalexemption = REPLACE(roll_totalexemption, ‘,’, ‘’)")
+        cur.execute("UPDATE “laCountyData2” SET nettaxablevalue = REPLACE(nettaxablevalue, ‘,’, ‘’)")
 
 
         #updating our number of deleted rows based on what we removed
