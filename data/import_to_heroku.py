@@ -94,26 +94,18 @@ def import_to_heroku():
 
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
-    # query = "SELECT " + cols_as_string + "DISTINCT ON(ain) " + \
-    #     "ORDER BY `rollyear` DESC"
 
     data_generator = client.get_all('9trm-uz8i', select=cols_as_string + ", distinct ain", 
         usecodedescchar1="Commercial", istaxableparcel="Y", order="rollyear DESC")
 
     print("successfully got data generator from api endpoint")
 
-    # counter = 0
-    # for r in data_generator:
-    #     if counter == 10:
-    #         break
-    #     counter = counter + 1
-    #     print(r)
 
     fields = ['ain'] + fields
     for row in data_generator:
         # insert into table
         my_data = [row.get(field, "") for field in fields]
-        insert_query = "INSERT INTO rawParcelTable VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        insert_query = "INSERT INTO rawParcelTable VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING"
 
         # -- uncomment line to show error message -- 
         cur.execute(insert_query, tuple(my_data)) 
