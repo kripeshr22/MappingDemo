@@ -1,9 +1,11 @@
 import psycopg2
 from create_table import create_table_query
 from sodapy import Socrata
-from utils import profile 
+from utils import profile
 
 # ***** connect to the db and api *******
+
+
 @profile
 def import_to_heroku():
 
@@ -23,7 +25,6 @@ def import_to_heroku():
         print("I am unable to connect to the database")
 
         # all columns with unused cols commented out
-
 
     # just getting land values for now -> will add in improvement value later
     fields = [
@@ -80,25 +81,21 @@ def import_to_heroku():
         # 'location_1',
     ]
 
-
     # cursor
     cur = conn.cursor()
-
-
 
     # rewriting entire table for now
     cur.execute("DROP TABLE IF EXISTS rawParcelTable")
     cur.execute(create_table_query)
     print("created table. connecting to api")
 
-
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
     # query = "SELECT " + cols_as_string + "DISTINCT ON(ain) " + \
     #     "ORDER BY `rollyear` DESC"
 
-    data_generator = client.get_all('9trm-uz8i', select=cols_as_string + ", distinct ain", 
-        usecodedescchar1="Commercial", istaxableparcel="Y", order="rollyear DESC")
+    data_generator = client.get_all('9trm-uz8i', select=cols_as_string + ", distinct ain",
+                                    usecodedescchar1="Commercial", istaxableparcel="Y", order="rollyear DESC")
 
     print("successfully got data generator from api endpoint")
 
@@ -115,14 +112,14 @@ def import_to_heroku():
         my_data = [row.get(field, "") for field in fields]
         insert_query = "INSERT INTO rawParcelTable VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
-        # -- uncomment line to show error message -- 
-        cur.execute(insert_query, tuple(my_data)) 
+        # -- uncomment line to show error message --
+        cur.execute(insert_query, tuple(my_data))
 
         # -- show problem row, prevent error message --
-        # try: 
+        # try:
         #     cur.execute(insert_query, tuple(my_data))
         # except:
-        #     print(my_data) 
+        #     print(my_data)
         #     break
         conn.commit()
 

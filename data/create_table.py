@@ -9,6 +9,7 @@ create_table_query = "CREATE UNLOGGED TABLE IF NOT EXISTS rawParcelTable ( \
     sqftmain VARCHAR(10), \
     roll_landvalue VARCHAR(20) NOT NULL, \
     roll_landbaseyear VARCHAR(4) NOT NULL, \
+    istaxableparcel VARCHAR(1), \
     center_lat VARCHAR(25), \
     center_lon VARCHAR(25) \
 )"
