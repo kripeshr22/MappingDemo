@@ -1,0 +1,9 @@
+
+### check for unique ain ###
+select ain, count(*)
+  from rawparceltable
+ group by ain
+having count(*) > 1;
+
+
+###
