@@ -5,5 +5,7 @@ select ain, count(*)
  group by ain
 having count(*) > 1;
 
-
 ###
+
+### check for number of rows in cleaned table ##
+select count(*) from svr_table_2;

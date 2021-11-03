@@ -13,16 +13,18 @@ create_table_query_1 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_1 ( \
     center_lon VARCHAR(25) NOT NULL \
 )"
 
-create_table_query_1 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_2 ( \
+create_table_query_2 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_2 ( \
     ain VARCHAR(15) PRIMARY KEY, \
     taxratearea VARCHAR(5) NOT NULL, \
     usecode VARCHAR(5) NOT NULL, \
     usecodedescchar1 VARCHAR(20) NOT NULL,\
-    usecodedescchar2 VARCHAR(20), \
-    sqftmain VARCHAR(10), \
+    usecodedescchar2 VARCHAR(100), \
+    yearbuilt VARCHAR(4) NOT NULL,     \
+    effectiveyearbuilt VARCHAR(4) NOT NULL,     \
+    sqftmain VARCHAR(10) NOT NULL, \
     roll_landvalue VARCHAR(20) NOT NULL, \
     roll_landbaseyear VARCHAR(4) NOT NULL, \
-    istaxableparcel VARCHAR(1), \
+    istaxableparcel VARCHAR(1) NOT NULL, \
     cluster VARCHAR(5) NOT NULL, \
     situszip5 VARCHAR(5) NOT NULL, \
     center_lat VARCHAR(25) NOT NULL, \
