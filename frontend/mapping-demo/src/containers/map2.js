@@ -16,7 +16,7 @@ const Map2 = () => {
 
     return (
         <div>
-            <h1>MAP TEST</h1>
+            <h1 className="header">Facts coming here soon!</h1>
             <ReactMapGL 
             mapStyle={'mapbox://styles/mapbox/dark-v9'}
             mapboxApiAccessToken = {MAPBOX_TOKEN}

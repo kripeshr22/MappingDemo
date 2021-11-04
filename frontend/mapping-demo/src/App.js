@@ -19,8 +19,8 @@ function App() {
           <Redirect to='/home'/>
         )}/>
         <Route path='/home' component={Home}></Route>
-        <Route path='/about' component={About}></Route>
         <Route path='/map2' component={Map2}></Route>
+        <Route path='/about' component={About}></Route>
         <Home>
         </Home>
         <About></About>

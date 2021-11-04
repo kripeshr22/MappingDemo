@@ -34,8 +34,8 @@ const Home = () => {
     return () => map.remove();
   }, []); 
         return (
-            <div>
-                <h1 className="header">SOME MAP </h1>
+            <div className="home">
+                <h1 className="header"> [Project Under Construction] </h1>
             <div className="map">
         <div className="map-container" ref={mapContainer} />
         </div>
