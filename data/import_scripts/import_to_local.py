@@ -29,6 +29,7 @@ def connect_to_db(database, user, password):
 
 def import_to_table(database, tablename, fields, create_table_query):
 
+    # for setting env variables (USER & PASSWORD): https://askubuntu.com/questions/58814/how-do-i-add-environment-variables
     conn = connect_to_db(database, os.getenv(
         "USER"), os.getenv("PASSWORD"))
     cur = conn.cursor()
