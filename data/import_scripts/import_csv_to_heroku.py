@@ -17,7 +17,7 @@ def get_insert_query(tablename, fields):
     num_fields = len(fields)
     format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
 
-    sql_insert = "INSERT INTO " + tablename + "VALUES" + format
+    sql_insert = "INSERT INTO " + tablename + " VALUES" + format
 
     return sql_insert
 

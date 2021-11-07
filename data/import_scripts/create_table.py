@@ -37,9 +37,9 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         AIN VARCHAR(15), \
         RollYear VARCHAR(4), \
         TaxRateArea VARCHAR(10), \
-        AssessorID VARCHAR(20), \
-        PropertyLocation VARCHAR(50), \
-        PropertyType VARCHAR(100), \
+        AssessorID VARCHAR(15), \
+        PropertyLocation VARCHAR(100), \
+        PropertyType VARCHAR(10), \
         PropertyUseCode VARCHAR(4), \
         GeneralUseType VARCHAR(20), \
         SpecificUseType VARCHAR(100), \
@@ -48,30 +48,30 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         totBuildingDataLines VARCHAR(10), \
         YearBuilt VARCHAR(4), \
         EffectiveYearBuilt VARCHAR(4), \
-        SQFTmain VARCHAR(10), \
+        SQFTmain VARCHAR(30), \
         Bedrooms VARCHAR(3), \
         Bathrooms VARCHAR(3), \
         Units VARCHAR(5), \
         RecordingDate VARCHAR(20), \
-        LandValue VARCHAR(20), \
+        LandValue VARCHAR(30), \
         LandBaseYear VARCHAR(4), \
-        ImprovementValue VARCHAR(10), \
+        ImprovementValue VARCHAR(30), \
         ImpBaseYear VARCHAR(4), \
-        TotalLandImpValue VARCHAR(20), \
-        HomeownersExemption VARCHAR(10), \
-        RealEstateExemption VARCHAR(10), \
-        FixtureValue VARCHAR(10), \
-        FixtureExemption VARCHAR(10), \
-        PersonalPropertyValue VARCHAR(10), \
-        PersonalPropertyExemption VARCHAR(10), \
-        isTaxableParcel VARCHAR(10), \
-        TotalValue VARCHAR(20), \
-        TotalExemption VARCHAR(20), \
-        netTaxableValue VARCHAR(20), \
-        SpecialParcelClassification VARCHAR(20), \
+        TotalLandImpValue VARCHAR(30), \
+        HomeownersExemption VARCHAR(30), \
+        RealEstateExemption VARCHAR(30), \
+        FixtureValue VARCHAR(30), \
+        FixtureExemption VARCHAR(30), \
+        PersonalPropertyValue VARCHAR(30), \
+        PersonalPropertyExemption VARCHAR(30), \
+        isTaxableParcel VARCHAR(1), \
+        TotalValue VARCHAR(30), \
+        TotalExemption VARCHAR(30), \
+        netTaxableValue VARCHAR(30), \
+        SpecialParcelClassification VARCHAR(100), \
         AdministrativeRegion VARCHAR(4), \
         Cluster VARCHAR(10), \
-        ParcelBoundaryDescription VARCHAR(200), \
+        ParcelBoundaryDescription VARCHAR(1000), \
         HouseNo VARCHAR(10), \
         HouseFraction VARCHAR(10), \
         StreetDirection VARCHAR(10), \
@@ -79,7 +79,7 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         UnitNo VARCHAR(10), \
         City VARCHAR(50), \
         ZIPcode5 VARCHAR(5), \
-        rowID VARCHAR(20), \
+        rowID VARCHAR(30), \
         CENTER_LAT VARCHAR(25), \
         CENTER_LON VARCHAR(25), \
         Location VARCHAR(100) \
