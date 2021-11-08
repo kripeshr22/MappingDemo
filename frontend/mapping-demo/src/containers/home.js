@@ -6,7 +6,9 @@ import "../styles/home.css"
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import mapboxgl from "!mapbox-gl";
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoia3JpcGVzaHIiLCJhIjoiY2t0OHg0MDMwMTZzaTJvcTJjYnlvZGFmaCJ9.Dfgb6MDEBqbvraywys_j9g';
+// const accessToken = 'pk.eyJ1Ijoia3JpcGVzaHIiLCJhIjoiY2t0OHg0MDMwMTZzaTJvcTJjYnlvZGFmaCJ9.Dfgb6MDEBqbvraywys_j9g';
+const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = token;
 const Home = () => {
     const mapContainer = useRef(null);
     useEffect(() => {
