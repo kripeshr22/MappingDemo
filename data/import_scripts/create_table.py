@@ -43,8 +43,8 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         PropertyUseCode VARCHAR(4), \
         GeneralUseType VARCHAR(20), \
         SpecificUseType VARCHAR(100), \
-        SpecificUseDetail1 VARCHAR(100), \
-        SpecificUseDetail2 VARCHAR(100), \
+        SpecificUseDetail1 VARCHAR, \
+        SpecificUseDetail2 VARCHAR, \
         totBuildingDataLines VARCHAR(10), \
         YearBuilt VARCHAR(4), \
         EffectiveYearBuilt VARCHAR(4), \
@@ -68,10 +68,10 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         TotalValue VARCHAR(30), \
         TotalExemption VARCHAR(30), \
         netTaxableValue VARCHAR(30), \
-        SpecialParcelClassification VARCHAR(100), \
+        SpecialParcelClassification VARCHAR, \
         AdministrativeRegion VARCHAR(4), \
         Cluster VARCHAR(10), \
-        ParcelBoundaryDescription VARCHAR(1000), \
+        ParcelBoundaryDescription VARCHAR, \
         HouseNo VARCHAR(10), \
         HouseFraction VARCHAR(10), \
         StreetDirection VARCHAR(10), \
@@ -82,7 +82,7 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         rowID VARCHAR(30), \
         CENTER_LAT VARCHAR(25), \
         CENTER_LON VARCHAR(25), \
-        Location VARCHAR(100) \
+        Location VARCHAR \
 )"
 
 

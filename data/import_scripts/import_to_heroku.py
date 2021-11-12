@@ -1,10 +1,11 @@
 import psycopg2
-from create_table import create_table_query_1, fields_1
+from create_table import create_table_query_2, fields_2
 from sodapy import Socrata
+from import_csv_to_heroku import get_insert_query, prevent_repeat_inserts_prefix
 
 
 def main():
-    import_from_api_to_heroku(fields_1, "rawParcelTable", create_table_query_1)
+    import_from_api_to_heroku(fields_1, "svrlatable", create_table_query_1)
 
 def connect_to_heroku_db():
     conn = ""
@@ -36,10 +37,10 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
     # cursor
     cur = conn.cursor()
 
-    # rewriting entire table for now
-    cur.execute("DROP TABLE IF EXISTS " + tablename)
-    cur.execute(create_table_query)
-    print("created table. connecting to api")
+    # rewriting entire table (comment out if not updating schema)
+    # cur.execute("DROP TABLE IF EXISTS " + tablename)
+    # cur.execute(create_table_query)
+    # print("created table. connecting to api")
 
 
     # Retrieve Json Data from API endpoint
@@ -51,32 +52,26 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
     print("successfully got data generator from api endpoint")
 
 
-    num_fields = len(fields)
-    format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
+    sql_insert = get_insert_query(tablename, fields)
+    try:
 
-    for row in data_generator:
-        # insert into table
-        my_data = [row.get(field, "") for field in fields]
-        insert_query = "INSERT INTO " + tablename + " VALUES " + format + " ON CONFLICT DO NOTHING"
+        for row in data_generator:
+            # insert into table
+            row_id = row[1]
+            query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
+            query_wrapped = "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
+                            sql_insert + ";\n\tEND IF;\nEND\n$do$"
 
-        # -- uncomment line to show error message -- 
-        cur.execute(insert_query, tuple(my_data)) 
-
-        # -- show problem row, prevent error message --
-        # try: 
-        #     cur.execute(insert_query, tuple(my_data))
-        # except:
-        #     print(my_data) 
-        #     break
-
-    print("closing cursor and connection")
-    conn.commit()
-
-    # close the cursor
-    cur.close()
-
-    # close the connection
-    conn.close()
+            my_data = [row.get(field, "") for field in fields]
+            cur.execute(query_wrapped, tuple(my_data)) 
+            conn.commit()
+    except (Exception, pg.Error) as e:
+            print(e)
+    finally:
+        if (conn):
+            cur.close()
+            conn.close()
+            print("Inserted data into table. Connection closed.")
 
 def clean_parcelData():
     #modeled after https://www.postgresqltutorial.com/postgresql-python/delete/
