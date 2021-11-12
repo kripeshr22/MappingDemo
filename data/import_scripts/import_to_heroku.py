@@ -1,7 +1,6 @@
 import psycopg2
 from create_table import create_table_query_2, fields_2
 from sodapy import Socrata
-from import_csv_to_heroku import get_insert_query, prevent_repeat_inserts_prefix
 
 
 def main():
@@ -19,6 +18,18 @@ def connect_to_heroku_db():
     
     return conn
 
+def get_insert_query(tablename, fields):
+    num_fields = len(fields)
+    format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
+    rowId = fields[-4]
+
+    sql_insert = "INSERT INTO " + tablename + " VALUES" + format
+
+    return sql_insert
+
+def prevent_repeat_inserts_prefix(tablename, row_id):
+    return  "IF NOT EXISTS (SELECT * FROM " + tablename + " WHERE " + \
+             "rowID = '" + row_id + "')"
 
 
 # ***** connect to the db and api *******
@@ -48,13 +59,11 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
 
     data_generator = client.get_all('9trm-uz8i', select=cols_as_string,
         usecodedescchar1="Commercial", istaxableparcel="Y")
-
     print("successfully got data generator from api endpoint")
 
-
     sql_insert = get_insert_query(tablename, fields)
-    try:
 
+    try:
         for row in data_generator:
             # insert into table
             row_id = row[1]

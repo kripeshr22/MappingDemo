@@ -1,4 +1,4 @@
-from import_to_heroku import connect_to_heroku_db 
+from import_to_heroku import connect_to_heroku_db, get_insert_query, prevent_repeat_inserts_prefix
 from create_table import create_raw_table, csv_fields
 import csv
 import psycopg2 as pg
@@ -13,18 +13,7 @@ def main():
 
     import_csv_to_heroku(tablename, create_table_query, fields, filepath)
 
-def get_insert_query(tablename, fields):
-    num_fields = len(fields)
-    format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
-    rowId = fields[-4]
 
-    sql_insert = "INSERT INTO " + tablename + " VALUES" + format
-
-    return sql_insert
-
-def prevent_repeat_inserts_prefix(tablename, row_id):
-    return  "IF NOT EXISTS (SELECT * FROM " + tablename + " WHERE " + \
-             "rowID = '" + row_id + "')"
 
 def import_csv_to_heroku(tablename, create_table_query, fields, filepath):
     ## connect to heroku ##

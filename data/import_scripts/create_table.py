@@ -2,86 +2,86 @@
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 create_table_query_1 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_1 ( \
-    ain VARCHAR(15) PRIMARY KEY, \
-    situszip VARCHAR(20) NOT NULL, \
-    usecodedescchar1 VARCHAR(20) NOT NULL,\
-    sqftmain VARCHAR(10), \
-    roll_landvalue VARCHAR(20) NOT NULL, \
+    ain VARCHAR PRIMARY KEY, \
+    situszip VARCHAR NOT NULL, \
+    usecodedescchar1 VARCHAR NOT NULL,\
+    sqftmain VARCHAR, \
+    roll_landvalue VARCHAR NOT NULL, \
     roll_landbaseyear VARCHAR(4) NOT NULL, \
     istaxableparcel VARCHAR(1), \
-    center_lat VARCHAR(25) NOT NULL, \
-    center_lon VARCHAR(25) NOT NULL \
+    center_lat VARCHAR NOT NULL, \
+    center_lon VARCHAR NOT NULL \
 )"
 
 create_table_query_2 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_2 ( \
-    ain VARCHAR(15) PRIMARY KEY, \
-    taxratearea VARCHAR(5) NOT NULL, \
-    usecode VARCHAR(5) NOT NULL, \
-    usecodedescchar1 VARCHAR(20) NOT NULL,\
-    usecodedescchar2 VARCHAR(100), \
+    ain VARCHAR PRIMARY KEY, \
+    taxratearea VARCHAR NOT NULL, \
+    usecode VARCHAR NOT NULL, \
+    usecodedescchar1 VARCHAR NOT NULL,\
+    usecodedescchar2 VARCHAR, \
     yearbuilt VARCHAR(4) NOT NULL,     \
     effectiveyearbuilt VARCHAR(4) NOT NULL,     \
-    sqftmain VARCHAR(10) NOT NULL, \
-    roll_landvalue VARCHAR(20) NOT NULL, \
+    sqftmain VARCHAR NOT NULL, \
+    roll_landvalue VARCHAR NOT NULL, \
     roll_landbaseyear VARCHAR(4) NOT NULL, \
     istaxableparcel VARCHAR(1) NOT NULL, \
-    cluster VARCHAR(5) NOT NULL, \
+    cluster VARCHAR NOT NULL, \
     situszip5 VARCHAR(5) NOT NULL, \
-    center_lat VARCHAR(25) NOT NULL, \
-    center_lon VARCHAR(25) NOT NULL \
+    center_lat VARCHAR NOT NULL, \
+    center_lon VARCHAR NOT NULL \
 )"
 
 create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
-        ZIPcode VARCHAR(10), \
-        TaxRateArea_CITY VARCHAR(50), \
-        AIN VARCHAR(15), \
+        ZIPcode VARCHAR, \
+        TaxRateArea_CITY VARCHAR, \
+        AIN VARCHAR, \
         RollYear VARCHAR(4), \
-        TaxRateArea VARCHAR(10), \
-        AssessorID VARCHAR(15), \
-        PropertyLocation VARCHAR(100), \
-        PropertyType VARCHAR(10), \
+        TaxRateArea VARCHAR, \
+        AssessorID VARCHAR, \
+        PropertyLocation VARCHAR, \
+        PropertyType VARCHAR, \
         PropertyUseCode VARCHAR(4), \
-        GeneralUseType VARCHAR(20), \
-        SpecificUseType VARCHAR(100), \
+        GeneralUseType VARCHAR, \
+        SpecificUseType VARCHAR, \
         SpecificUseDetail1 VARCHAR, \
         SpecificUseDetail2 VARCHAR, \
-        totBuildingDataLines VARCHAR(10), \
+        totBuildingDataLines VARCHAR, \
         YearBuilt VARCHAR(4), \
         EffectiveYearBuilt VARCHAR(4), \
-        SQFTmain VARCHAR(30), \
-        Bedrooms VARCHAR(3), \
-        Bathrooms VARCHAR(3), \
-        Units VARCHAR(5), \
-        RecordingDate VARCHAR(20), \
-        LandValue VARCHAR(30), \
-        LandBaseYear VARCHAR(4), \
-        ImprovementValue VARCHAR(30), \
+        SQFTmain VARCHAR, \
+        Bedrooms VARCHAR, \
+        Bathrooms VARCHAR, \
+        Units VARCHAR, \
+        RecordingDate VARCHAR, \
+        LandValue VARCHAR, \
+        LandBaseYear VARCHAR, \
+        ImprovementValue VARCHAR, \
         ImpBaseYear VARCHAR(4), \
-        TotalLandImpValue VARCHAR(30), \
-        HomeownersExemption VARCHAR(30), \
-        RealEstateExemption VARCHAR(30), \
-        FixtureValue VARCHAR(30), \
-        FixtureExemption VARCHAR(30), \
-        PersonalPropertyValue VARCHAR(30), \
-        PersonalPropertyExemption VARCHAR(30), \
+        TotalLandImpValue VARCHAR, \
+        HomeownersExemption VARCHAR, \
+        RealEstateExemption VARCHAR, \
+        FixtureValue VARCHAR, \
+        FixtureExemption VARCHAR, \
+        PersonalPropertyValue VARCHAR, \
+        PersonalPropertyExemption VARCHAR, \
         isTaxableParcel VARCHAR(1), \
-        TotalValue VARCHAR(30), \
-        TotalExemption VARCHAR(30), \
-        netTaxableValue VARCHAR(30), \
+        TotalValue VARCHAR, \
+        TotalExemption VARCHAR, \
+        netTaxableValue VARCHAR, \
         SpecialParcelClassification VARCHAR, \
         AdministrativeRegion VARCHAR(4), \
-        Cluster VARCHAR(10), \
+        Cluster VARCHAR, \
         ParcelBoundaryDescription VARCHAR, \
-        HouseNo VARCHAR(10), \
-        HouseFraction VARCHAR(10), \
-        StreetDirection VARCHAR(10), \
-        StreetName VARCHAR(50), \
-        UnitNo VARCHAR(10), \
-        City VARCHAR(50), \
+        HouseNo VARCHAR, \
+        HouseFraction VARCHAR, \
+        StreetDirection VARCHAR, \
+        StreetName VARCHAR, \
+        UnitNo VARCHAR, \
+        City VARCHAR, \
         ZIPcode5 VARCHAR(5), \
-        rowID VARCHAR(30), \
-        CENTER_LAT VARCHAR(25), \
-        CENTER_LON VARCHAR(25), \
+        rowID VARCHAR, \
+        CENTER_LAT VARCHAR, \
+        CENTER_LON VARCHAR, \
         Location VARCHAR \
 )"
 
