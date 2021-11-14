@@ -17,10 +17,12 @@ const Home = () => {
             const response = await fetch("/server/testGet/");
             const data = await response.json();
             setMarkers(data["results"]);
+            console.log("markers get", markers);
         } catch (err) {
             console.log(err.message);
         }
     }
+
         // await fetch("/server/testGet/", {method: "GET"})
         //     .then(function(response){
         //         return response.json()
@@ -36,9 +38,10 @@ const Home = () => {
         //     .catch(function(error){
         //         console.log('Request failed', error)
         //     })
-    function renderMap() {
+    // getMarkers();
+    function renderMap(){
         getMarkers();
-        console.log("markers", markers);
+        // console.log('markers', markers);
         const map = new mapboxgl.Map({
             container: mapContainer.current,
             // See style options here: https://docs.mapbox.com/api/maps/#styles
@@ -54,13 +57,13 @@ const Home = () => {
         //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
         // `
         // );
-        markers.map(marker => {
-            map.addControl(new mapboxgl.Marker()
-                .setLngLat([marker.center_lon, marker.center_lat])
-                .addTo(map)
-                .setPopup(new mapboxgl.Popup({ offset: 25 })
-                    .setHTML(`<a>${marker.nettaxablevalue}</a>`))
-        )});
+        // markers.forEach(marker => {
+        //     map.addControl(new mapboxgl.Marker()
+        //         .setLngLat([marker.center_lon, marker.center_lat])
+        //         .addTo(map)
+        //         .setPopup(new mapboxgl.Popup({ offset: 25 })
+        //             .setHTML(`<a>${marker.nettaxablevalue}</a>`))
+        // )});
         // map.addControl(new mapboxgl.Marker()
         //     .setLngLat([-118.3581, 34.0722])
         //     .addTo(map)
@@ -71,7 +74,7 @@ const Home = () => {
     }
     useEffect(() => {
         renderMap();
-    }, []);
+    });
         return (
             <div className="home">
                 <h1 className="header"> [Project Under Construction] </h1>
