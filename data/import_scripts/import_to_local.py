@@ -6,7 +6,7 @@ from sodapy import Socrata
 
 def main():
     # latest version of cleaned data schema to sue
-    database = "parcelDatabase"
+    database = "parceldatabase"
     tablename = "svr_table_2"
     create_table_query = create_table_query_2
     fields = fields_2
@@ -16,6 +16,9 @@ def main():
 
 # ***** connect to the db *******
 def connect_to_db(database, user, password):
+    conn = ""
+    # conn = psycopg2.connect(database=database, user=user, password=password)
+    # print("conn is ", conn)
     try:
         conn = psycopg2.connect(database=database, user=user, password=password)
         print("successfully connected to database")
@@ -30,8 +33,9 @@ def connect_to_db(database, user, password):
 def import_to_table(database, tablename, fields, create_table_query):
 
     # for setting env variables (USER & PASSWORD): https://askubuntu.com/questions/58814/how-do-i-add-environment-variables
-    conn = connect_to_db(database, os.getenv(
-        "USER"), os.getenv("PASSWORD"))
+    #conn = connect_to_db(database, os.getenv(
+    #    "USER"), os.getenv("PASSWORD"))
+    conn = connect_to_db(database, "newuser", "password")
     cur = conn.cursor()
 
 
@@ -82,6 +86,19 @@ def import_to_table(database, tablename, fields, create_table_query):
     cur.execute("DELETE FROM " + tablename + " WHERE center_lon = '0'")
     cur.execute("DELETE FROM " + tablename + " WHERE center_lat = '0'")
     cur.execute("DELETE FROM " + tablename + " WHERE roll_landbaseyear = '0'")
+    cur.execute("DELETE FROM " + tablename + " WHERE sqftmain = '0'")
+    #DELETE FROM svr_table_2 where (situszip5 !~ '^[0-9]+$'); - deletes NaN values from situszip
+    cur.execute("DELETE FROM " + tablename + " WHERE (situszip5 !~ '^[0-9]+$')")
+    #DELETE FROM svr_table_2 where (center_lon !~ '^-?[0-9][0-9,\.]+$');   - deletes NaN values from center_lon
+    cur.execute("DELETE FROM " + tablename + " WHERE (center_lon !~ '^-?[0-9][0-9,\.]+$')")
+    # delete if effective year built is 0
+    cur.execute("DELETE FROM " + tablename + " WHERE (effectiveyearbuilt = '0')")
+    # some effective year built values where double digit numbers - this gets rid of them
+    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
+    # some year built values where double digit numbers - this gets rid of them
+    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
+    # 3 columns didn't have a full use code
+    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(usecode) < 4)")
     conn.commit()
 
     print("closing cursor and connection")
