@@ -62,7 +62,7 @@ if(process.env.NODE_ENV == "production"){
     // For any request that doesn't match, this sends the index.html file from the client. This is used for all of our React code.
     //Eliminates need to set redirect in package.json at start script with concurrently
     app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname+'/client/build/index.html'));
+        res.sendFile(path.join(__dirname+'/mapping-demo/build/index.html'));
     })
 }
 

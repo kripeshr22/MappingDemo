@@ -9,25 +9,8 @@ import NavigationBar from './components/nav_bar'
 import { Route, Redirect, Switch, HashRouter } from 'react-router-dom'
 
 function App() {
-    function testHerokuPg(){
-        fetch("/server/testHerokuPg/", {method: "GET"})
-            .then(function(response){
-                return response.json()
-                    .then(function(data){
-                        console.log("Results of test:");
-                        console.log(data);
-
-                        let resultsArray = data["results"]
-                        document.getElementById("outputBox").innerHTML = `Retrived id=${resultsArray[0].id}, name=${resultsArray[0].name}`;
-                    })
-            })
-            .catch(function(error){
-                console.log('Request failed', error)
-            })
-    }
   return (
     <div className ="app">
-        <button onClick={() => {testHerokuPg()}}>Test Heroku Pg</button>
       <HashRouter>
       <NavigationBar></NavigationBar>
       <Switch>
