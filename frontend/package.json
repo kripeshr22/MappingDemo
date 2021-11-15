@@ -1,0 +1,24 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "PSQL-Express API to fetch county data",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "express-promise-router": "^3.0.3",
+    "nodemon": "^2.0.7",
+    "path": "^0.12.7",
+    "pg": "^8.0.3"
+  },
+  "engines": {
+    "npm": "^6.4.1",
+    "node": "^9.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon server.js",
+    "heroku-postbuild": "npm install && cd mapping-demo && npm install && npm run build"
+  }
+}

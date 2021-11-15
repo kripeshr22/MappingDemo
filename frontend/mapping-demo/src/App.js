@@ -8,7 +8,6 @@ import Map2 from './containers/map2'
 import NavigationBar from './components/nav_bar'
 import { Route, Redirect, Switch, HashRouter } from 'react-router-dom'
 
-
 function App() {
   return (
     <div className ="app">
