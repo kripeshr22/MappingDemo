@@ -61,10 +61,6 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
         usecodedescchar1="Commercial", istaxableparcel="Y")
     print("successfully got data generator from api endpoint")
 
-<<<<<<< HEAD:data/import_to_heroku.py
-    # close the connection
-    conn.close()
-=======
     sql_insert = get_insert_query(tablename, fields)
 
     try:
@@ -137,4 +133,3 @@ def clean_parcelData():
         #close connection to heroku
         conn.close()
     return deletedRows
->>>>>>> 8f4bee33688791d0161b7d63a59702f8aa497c89:data/import_scripts/import_to_heroku.py
