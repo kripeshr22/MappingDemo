@@ -1,5 +1,5 @@
-import psycopg2
-from create_table import create_table_query_2, fields_2
+import psycopg2 as pg
+from create_table import create_table_query_1, fields_1
 from sodapy import Socrata
 
 
@@ -10,7 +10,7 @@ def connect_to_heroku_db():
     conn = ""
     # connect to standard-0 heroku db
     try:
-        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+        conn = pg.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         print("successfully connected to database")
     except:
@@ -89,7 +89,7 @@ def clean_parcelData():
     # to see if our cleaning method is helpful
     try:
 
-        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+        conn = pg.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         cur = conn.cursor()
         #deleting rows based on anna's work 
