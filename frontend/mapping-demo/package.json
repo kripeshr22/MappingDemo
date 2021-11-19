@@ -22,7 +22,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "buildncopy": "npm run build && (cp -r build ../backend/)"
+    "buildncopy": "npm run build && (cp -r build ../)"
   },
   "eslintConfig": {
     "extends": [
