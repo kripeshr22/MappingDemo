@@ -97,8 +97,6 @@ def import_to_table(database, tablename, fields, create_table_query):
     cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
     # some year built values where double digit numbers - this gets rid of them
     cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
-    # 3 columns didn't have a full use code
-    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(usecode) < 4)")
     conn.commit()
 
     print("closing cursor and connection")
