@@ -1,16 +1,23 @@
 # script to make a table w correct schema in postgresql database
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
+create_test_table = """CREATE UNLOGGED TABLE IF NOT EXISTS testtable (
+    ain VARCHAR PRIMARY KEY, \
+    situszip VARCHAR, \
+    usecodedescchar1 VARCHAR\
+)"""
+
+test_fields = ["ain", "situszip", "usecodedescchar1"]
 create_table_query_1 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_1 ( \
     ain VARCHAR PRIMARY KEY, \
-    situszip VARCHAR NOT NULL, \
-    usecodedescchar1 VARCHAR NOT NULL,\
+    situszip VARCHAR, \
+    usecodedescchar1 VARCHAR,\
     sqftmain VARCHAR, \
-    roll_landvalue VARCHAR NOT NULL, \
-    roll_landbaseyear VARCHAR(4) NOT NULL, \
-    istaxableparcel VARCHAR(1), \
-    center_lat VARCHAR NOT NULL, \
-    center_lon VARCHAR NOT NULL \
+    roll_landvalue VARCHAR, \
+    roll_landbaseyear VARCHAR, \
+    istaxableparcel VARCHAR, \
+    center_lat VARCHAR, \
+    center_lon VARCHAR \
 )"
 
 create_table_query_2 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_2 ( \
@@ -86,7 +93,7 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
 )"
 
 
-csv_fields = [
+all_fields = [
         'ZIPcode',
         'TaxRateArea_CITY',
         'AIN',

@@ -1,10 +1,12 @@
 import psycopg2 as pg
-from create_table import create_table_query_1, fields_1
+import psycopg2.extras
+from create_table import create_raw_table, all_fields, fields_1, create_table_query_1, test_fields, create_test_table
 from sodapy import Socrata
 
 
 def main():
-    import_from_api_to_heroku(fields_1, "svrlatable", create_table_query_1)
+    tablename = "testtable"
+    import_from_api_to_heroku(test_fields, tablename, create_test_table, True)
 
 def connect_to_heroku_db():
     conn = ""
@@ -31,9 +33,14 @@ def prevent_repeat_inserts_prefix(tablename, row_id):
     return  "IF NOT EXISTS (SELECT * FROM " + tablename + " WHERE " + \
              "rowID = '" + row_id + "')"
 
+def wrap_query(tablename, insert_query, row_id):
+    query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
+
+    return "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
+                    insert_query + ";\n\tEND IF;\nEND\n$do$"
 
 # ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, create_table_query):
+def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_table=False):
 
     client = Socrata(
         "data.lacounty.gov",
@@ -49,9 +56,11 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
     cur = conn.cursor()
 
     # rewriting entire table (comment out if not updating schema)
-    # cur.execute("DROP TABLE IF EXISTS " + tablename)
-    # cur.execute(create_table_query)
-    # print("created table. connecting to api")
+    if rewrite_table:
+        cur.execute("DROP TABLE IF EXISTS " + tablename)
+        cur.execute(create_table_query)
+        conn.commit()
+        print("created table. connecting to api")
 
 
     # Retrieve Json Data from API endpoint
@@ -61,19 +70,47 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
         usecodedescchar1="Commercial", istaxableparcel="Y")
     print("successfully got data generator from api endpoint")
 
-    sql_insert = get_insert_query(tablename, fields)
+    # insert_query = "INSERT INTO " + tablename + " VALUES %s;"
+    insert_query = """INSERT INTO staging_beers VALUES (
+                %(ain)s,
+                %(situszip)s,
+                %(usecodedescchar1)s,
+            );
+        """
 
     try:
-        for row in data_generator:
-            # insert into table
-            row_id = row[1]
-            query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
-            query_wrapped = "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
-                            sql_insert + ";\n\tEND IF;\nEND\n$do$"
+        print("Inserting data")
+        print(next(data_generator))
 
-            my_data = [row.get(field, "") for field in fields]
-            cur.execute(query_wrapped, tuple(my_data)) 
-            conn.commit()
+        dict_base = dict.fromkeys(fields, "")
+        iter_data = (dict_base.update(data) for data in data_generator)
+        
+        print(next(iter_data))
+        print(next(iter_data))
+
+
+        psycopg2.extras.execute_values(
+            cur,
+            insert_query,
+            iter_data
+        )
+
+        # with conn.cursor() as cur: # when conn is in 'with' statement, it autocommits
+            # psycopg2.extras.execute_values(
+            #     cur, 
+            #     insert_query,
+            #     [tuple([row.get(field, "") for field in fields]) for row in data_generator]
+            # )
+        conn.commit()
+
+
+        # for row in data_generator:
+        #     # insert into table
+        #     query_wrapped = wrap_query(tablename, insert_query, row[1])
+
+        #     my_data = [row.get(field, "") for field in fields]
+        #     psycopg2.extras.execute_values(cur, query_wrapped, tuple(my_data))
+            # conn.commit()
     except (Exception, pg.Error) as e:
             print(e)
     finally:
