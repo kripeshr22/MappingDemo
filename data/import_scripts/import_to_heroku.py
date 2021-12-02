@@ -6,7 +6,8 @@ from sodapy import Socrata
 
 def main():
     tablename = "testtable"
-    import_from_api_to_heroku(test_fields, tablename, create_test_table, True)
+    primary_key = "rowid"
+    import_from_api_to_heroku(test_fields, tablename, primary_key, create_test_table, True)
 
 def connect_to_heroku_db():
     conn = ""
@@ -40,7 +41,7 @@ def wrap_query(tablename, insert_query, row_id):
                     insert_query + ";\n\tEND IF;\nEND\n$do$"
 
 # ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_table=True):
+def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
 
     client = Socrata(
         "data.lacounty.gov",
@@ -55,7 +56,7 @@ def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_
     # cursor
     cur = conn.cursor()
 
-    # rewriting entire table (comment out if not updating schema)
+    # rewriting entire table 
     if rewrite_table:
         cur.execute("DROP TABLE IF EXISTS " + tablename)
         cur.execute(create_table_query)
@@ -66,43 +67,25 @@ def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
 
-
-
-    insert_query = "INSERT INTO " + tablename + " VALUES %s;"
-    # insert_query = """INSERT INTO testtable VALUES (
-    #             %(ain)s,
-    #             %(situszip)s,
-    #             %(usecodedescchar1)s,
-    #         );
-    #     """
+    insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
 
     num_records = client.get_all('9trm-uz8i', select="count(*)")
     num_records = int(next(num_records).get("count"))
-    print(num_records)
-    offset = 0
-    limit = 1000
+    print("Total of ", num_records, " to import")
 
+    ### page size = 1000 -> 33k rows/min
+    ### page size = 25k -> 40k rows/40 sec
+    ### page size = 50k -> 50k rows/38 sec
+    offset = 0
+    limit = 25000
 
     try:
         print("Inserting data")
 
         while(offset < num_records):
-
-            # print(next(data_generator))
-
-            # dict_base = dict.fromkeys(fields, "")
-            # iter_data = (dict_base.update(data) for data in data_generator)
-
             data_generator = client.get('9trm-uz8i', select=cols_as_string,
                                             usecodedescchar1="Commercial", istaxableparcel="Y",
-                                            order="rowid DESC", limit=limit, offset=offset)
-
-            # iter_data = [tuple([data.get(f, "") for f in fields])
-            #              for data in data_generator]
-            # print(iter_data)
-            # print(next(iter_data))
-
-    ## TO DO: split up data beforehand in chunks and keep track of where i left off to insert
+                                            order=primary_key+" DESC", limit=limit, offset=offset)
 
             psycopg2.extras.execute_values(
                 cur,
@@ -111,24 +94,10 @@ def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_
                 for data in data_generator]
             )
 
-            # with conn.cursor() as cur: # when conn is in 'with' statement, it autocommits
-                # psycopg2.extras.execute_values(
-                #     cur, 
-                #     insert_query,
-                #     [tuple([row.get(field, "") for field in fields]) for row in data_generator]
-                # )
             conn.commit()
             offset = offset + limit
             print("offset is ", offset)
 
-
-            # for row in data_generator:
-            #     # insert into table
-            #     query_wrapped = wrap_query(tablename, insert_query, row[1])
-
-            #     my_data = [row.get(field, "") for field in fields]
-            #     psycopg2.extras.execute_values(cur, query_wrapped, tuple(my_data))
-                # conn.commit()
     except (Exception, pg.Error) as e:
             print(e)
     finally:
