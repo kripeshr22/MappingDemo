@@ -40,7 +40,7 @@ def wrap_query(tablename, insert_query, row_id):
                     insert_query + ";\n\tEND IF;\nEND\n$do$"
 
 # ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_table=False):
+def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_table=True):
 
     client = Socrata(
         "data.lacounty.gov",
@@ -66,51 +66,69 @@ def import_from_api_to_heroku(fields, tablename, create_table_query="", rewrite_
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
 
-    data_generator = client.get_all('9trm-uz8i', select=cols_as_string,
-        usecodedescchar1="Commercial", istaxableparcel="Y")
-    print("successfully got data generator from api endpoint")
 
-    # insert_query = "INSERT INTO " + tablename + " VALUES %s;"
-    insert_query = """INSERT INTO staging_beers VALUES (
-                %(ain)s,
-                %(situszip)s,
-                %(usecodedescchar1)s,
-            );
-        """
+
+    insert_query = "INSERT INTO " + tablename + " VALUES %s;"
+    # insert_query = """INSERT INTO testtable VALUES (
+    #             %(ain)s,
+    #             %(situszip)s,
+    #             %(usecodedescchar1)s,
+    #         );
+    #     """
+
+    num_records = client.get_all('9trm-uz8i', select="count(*)")
+    num_records = int(next(num_records).get("count"))
+    print(num_records)
+    offset = 0
+    limit = 1000
+
 
     try:
         print("Inserting data")
-        print(next(data_generator))
 
-        dict_base = dict.fromkeys(fields, "")
-        iter_data = (dict_base.update(data) for data in data_generator)
-        
-        print(next(iter_data))
-        print(next(iter_data))
+        while(offset < num_records):
+
+            # print(next(data_generator))
+
+            # dict_base = dict.fromkeys(fields, "")
+            # iter_data = (dict_base.update(data) for data in data_generator)
+
+            data_generator = client.get('9trm-uz8i', select=cols_as_string,
+                                            usecodedescchar1="Commercial", istaxableparcel="Y",
+                                            order="rowid DESC", limit=limit, offset=offset)
+
+            # iter_data = [tuple([data.get(f, "") for f in fields])
+            #              for data in data_generator]
+            # print(iter_data)
+            # print(next(iter_data))
+
+    ## TO DO: split up data beforehand in chunks and keep track of where i left off to insert
+
+            psycopg2.extras.execute_values(
+                cur,
+                insert_query,
+                [tuple([data.get(f, "") for f in fields])
+                for data in data_generator]
+            )
+
+            # with conn.cursor() as cur: # when conn is in 'with' statement, it autocommits
+                # psycopg2.extras.execute_values(
+                #     cur, 
+                #     insert_query,
+                #     [tuple([row.get(field, "") for field in fields]) for row in data_generator]
+                # )
+            conn.commit()
+            offset = offset + limit
+            print("offset is ", offset)
 
 
-        psycopg2.extras.execute_values(
-            cur,
-            insert_query,
-            iter_data
-        )
+            # for row in data_generator:
+            #     # insert into table
+            #     query_wrapped = wrap_query(tablename, insert_query, row[1])
 
-        # with conn.cursor() as cur: # when conn is in 'with' statement, it autocommits
-            # psycopg2.extras.execute_values(
-            #     cur, 
-            #     insert_query,
-            #     [tuple([row.get(field, "") for field in fields]) for row in data_generator]
-            # )
-        conn.commit()
-
-
-        # for row in data_generator:
-        #     # insert into table
-        #     query_wrapped = wrap_query(tablename, insert_query, row[1])
-
-        #     my_data = [row.get(field, "") for field in fields]
-        #     psycopg2.extras.execute_values(cur, query_wrapped, tuple(my_data))
-            # conn.commit()
+            #     my_data = [row.get(field, "") for field in fields]
+            #     psycopg2.extras.execute_values(cur, query_wrapped, tuple(my_data))
+                # conn.commit()
     except (Exception, pg.Error) as e:
             print(e)
     finally:

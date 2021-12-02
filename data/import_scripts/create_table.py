@@ -2,9 +2,9 @@
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 create_test_table = """CREATE UNLOGGED TABLE IF NOT EXISTS testtable (
-    ain VARCHAR PRIMARY KEY, \
+    rowid VARCHAR PRIMARY KEY, \
     situszip VARCHAR, \
-    usecodedescchar1 VARCHAR\
+    taxratearea_city VARCHAR\
 )"""
 
 test_fields = ["ain", "situszip", "usecodedescchar1"]
@@ -86,7 +86,7 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         UnitNo VARCHAR, \
         City VARCHAR, \
         ZIPcode5 VARCHAR(5), \
-        rowID VARCHAR, \
+        rowID VARCHAR PRIMARY KEY, \
         CENTER_LAT VARCHAR, \
         CENTER_LON VARCHAR, \
         Location VARCHAR \
