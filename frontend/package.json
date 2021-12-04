@@ -19,6 +19,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "nodemon server.js",
-    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy"
+    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy",
+    "buildlambda": "./node_modules/.bin/netlify-lambda build src"
   }
 }
