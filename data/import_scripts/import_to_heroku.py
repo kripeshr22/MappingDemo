@@ -74,7 +74,7 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
     print("Total of ", num_records, " to import")
 
     ### page size = 1000 -> 33k rows/min
-    ### page size = 25k -> 40k rows/40 sec
+    ### page size = 25k -> 20k rows/20 sec
     ### page size = 50k -> 50k rows/38 sec
     offset = 0
     limit = 25000
