@@ -1,13 +1,14 @@
 import psycopg2 as pg
 import psycopg2.extras
-from create_table import create_raw_table, all_fields, fields_1, create_table_query_1, test_fields, create_test_table
+from create_table import raw_socrata_table_schema, all_fields_socrata
 from sodapy import Socrata
 
 
 def main():
-    tablename = "testtable"
-    primary_key = "rowid"
-    import_from_api_to_heroku(test_fields, tablename, primary_key, create_test_table, True)
+    tablename = "rawlacountytable"
+    primary_key = "rowID"
+    import_from_api_to_heroku(all_fields_socrata, tablename,
+                              primary_key, raw_socrata_table_schema)
 
 def connect_to_heroku_db():
     conn = ""
@@ -21,32 +22,13 @@ def connect_to_heroku_db():
     
     return conn
 
-def get_insert_query(tablename, fields):
-    num_fields = len(fields)
-    format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
-    rowId = fields[-4]
-
-    sql_insert = "INSERT INTO " + tablename + " VALUES" + format
-
-    return sql_insert
-
-def prevent_repeat_inserts_prefix(tablename, row_id):
-    return  "IF NOT EXISTS (SELECT * FROM " + tablename + " WHERE " + \
-             "rowID = '" + row_id + "')"
-
-def wrap_query(tablename, insert_query, row_id):
-    query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
-
-    return "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
-                    insert_query + ";\n\tEND IF;\nEND\n$do$"
-
 # ***** connect to the db and api *******
 def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
 
     client = Socrata(
         "data.lacounty.gov",
         app_token='8uMOnLx6S823qlm58la47e6Pd', # tech equity token for socrata api access
-        timeout=1000
+        timeout=1000000
     )
 
     conn = connect_to_heroku_db()
@@ -71,10 +53,10 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
 
     num_records = client.get_all('9trm-uz8i', select="count(*)")
     num_records = int(next(num_records).get("count"))
-    print("Total of ", num_records, " to import")
+    print("Total of ", num_records, " records attempted to insert")
 
     ### page size = 1000 -> 33k rows/min
-    ### page size = 25k -> 20k rows/20 sec
+    ### page size = 25k -> 50k rows/50 sec
     ### page size = 50k -> 50k rows/38 sec
     offset = 0
     limit = 25000
