@@ -8,19 +8,33 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-promise-router": "^3.0.3",
-    "netlify-lambda": "^2.0.15",
     "nodemon": "^2.0.7",
     "path": "^0.12.7",
     "pg": "^8.0.3"
   },
   "engines": {
     "npm": "^6.4.1",
-    "node": "^16.13.1"
+    "node": "^14.17.0"
   },
   "devDependencies": {},
   "scripts": {
     "start": "nodemon server.js",
-    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy",
-    "buildlambda": "./node_modules/.bin/netlify-lambda build src"
-  }
+    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kripeshr22/MappingDemo.git"
+  },
+  "keywords": [
+    "mapping",
+    "housing",
+    "la",
+    "county"
+  ],
+  "author": "TechEquity Clinic Team 21/22",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kripeshr22/MappingDemo/issues"
+  },
+  "homepage": "https://github.com/kripeshr22/MappingDemo#readme"
 }

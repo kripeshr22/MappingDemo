@@ -20,6 +20,7 @@ async function testGet (request, response) {
         console.log('Succesfully connected')
         const rowList = await client.query('SELECT * FROM rawlacountytable LIMIT 1000');
         const results = { 'results': (rowList) ? rowList.rows : null};
+        console.log(results);
         response.status(200).send(results);
     } catch (error){
         response.status(400).json('SERVER RESP: Error retrieving userrecords. Log:'+error)

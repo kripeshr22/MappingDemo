@@ -1,8 +1,8 @@
 //Require the express module, built in bodyParser middlware, and set our app and port variables
 const express = require('express');
 const app = express();
-cons router = express.Router();
-const serverless = require('serverless-http');
+const router = express.Router();
+// const serverless = require('serverless-http');
 const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config(); //Allows retriving variables from the .env file
@@ -28,7 +28,7 @@ if(process.env.NODE_ENV != "production"){
     //tell a route making a GET request on the root (/) URL to head to the HomePage
     app.get("/server/", (request, response) => {
         if (error) {
-            throw error
+            throw error;
         }
         response.sendFile(__dirname + '/mapping-demo/public/index.html');
         //response.send("Server running on Node.js, Express, and Postgres API")
@@ -51,7 +51,7 @@ if(process.env.NODE_ENV == "production"){
     //tell a route making a GET request on the root (/) URL to head to the HomePage
     app.get("/server/", (request, response) => {
         if (error) {
-            throw error
+            throw error;
         }
         response.sendFile(__dirname + '/frontend/build/index.html');
         //response.send("Server running on Node.js, Express, and Postgres API")
@@ -75,4 +75,4 @@ app.listen(port, () => {
     console.log(`App running on port ${port}.`)
 })
 
-module.exports.handler = serverless(app);
+// module.exports.handler = serverless(app);
