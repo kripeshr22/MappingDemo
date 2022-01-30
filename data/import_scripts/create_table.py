@@ -1,16 +1,23 @@
 # script to make a table w correct schema in postgresql database
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
+create_test_table = """CREATE UNLOGGED TABLE IF NOT EXISTS testtable (
+    rowid VARCHAR PRIMARY KEY, \
+    situszip VARCHAR, \
+    taxratearea_city VARCHAR\
+)"""
+
+test_fields = ["ain", "situszip", "usecodedescchar1"]
 create_table_query_1 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_1 ( \
     ain VARCHAR PRIMARY KEY, \
-    situszip VARCHAR NOT NULL, \
-    usecodedescchar1 VARCHAR NOT NULL,\
+    situszip VARCHAR, \
+    usecodedescchar1 VARCHAR,\
     sqftmain VARCHAR, \
-    roll_landvalue VARCHAR NOT NULL, \
-    roll_landbaseyear VARCHAR(4) NOT NULL, \
-    istaxableparcel VARCHAR(1), \
-    center_lat VARCHAR NOT NULL, \
-    center_lon VARCHAR NOT NULL \
+    roll_landvalue VARCHAR, \
+    roll_landbaseyear VARCHAR, \
+    istaxableparcel VARCHAR, \
+    center_lat VARCHAR, \
+    center_lon VARCHAR \
 )"
 
 create_table_query_2 = "CREATE UNLOGGED TABLE IF NOT EXISTS svr_table_2 ( \
@@ -79,14 +86,14 @@ create_raw_table = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         UnitNo VARCHAR, \
         City VARCHAR, \
         ZIPcode5 VARCHAR(5), \
-        rowID VARCHAR, \
+        rowID VARCHAR PRIMARY KEY, \
         CENTER_LAT VARCHAR, \
         CENTER_LON VARCHAR, \
         Location VARCHAR \
 )"
 
 
-csv_fields = [
+all_fields = [
         'ZIPcode',
         'TaxRateArea_CITY',
         'AIN',

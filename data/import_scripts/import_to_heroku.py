@@ -1,16 +1,19 @@
-import psycopg2
-from create_table import create_table_query_2, fields_2
+import psycopg2 as pg
+import psycopg2.extras
+from create_table import create_raw_table, all_fields, fields_1, create_table_query_1, test_fields, create_test_table
 from sodapy import Socrata
 
 
 def main():
-    import_from_api_to_heroku(fields_1, "svrlatable", create_table_query_1)
+    tablename = "testtable"
+    primary_key = "rowid"
+    import_from_api_to_heroku(test_fields, tablename, primary_key, create_test_table, True)
 
 def connect_to_heroku_db():
     conn = ""
     # connect to standard-0 heroku db
     try:
-        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+        conn = pg.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         print("successfully connected to database")
     except:
@@ -31,9 +34,14 @@ def prevent_repeat_inserts_prefix(tablename, row_id):
     return  "IF NOT EXISTS (SELECT * FROM " + tablename + " WHERE " + \
              "rowID = '" + row_id + "')"
 
+def wrap_query(tablename, insert_query, row_id):
+    query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
+
+    return "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
+                    insert_query + ";\n\tEND IF;\nEND\n$do$"
 
 # ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, create_table_query):
+def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
 
     client = Socrata(
         "data.lacounty.gov",
@@ -48,36 +56,48 @@ def import_from_api_to_heroku(fields, tablename, create_table_query):
     # cursor
     cur = conn.cursor()
 
-    # rewriting entire table (comment out if not updating schema)
-    # cur.execute("DROP TABLE IF EXISTS " + tablename)
-    # cur.execute(create_table_query)
-    # print("created table. connecting to api")
+    # rewriting entire table 
+    if rewrite_table:
+        cur.execute("DROP TABLE IF EXISTS " + tablename)
+        cur.execute(create_table_query)
+        conn.commit()
+        print("created table. connecting to api")
 
 
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
 
-    data_generator = client.get_all('9trm-uz8i', select=cols_as_string,
-        usecodedescchar1="Commercial", istaxableparcel="Y")
-    print("successfully got data generator from api endpoint")
+    insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
 
-<<<<<<< HEAD:data/import_to_heroku.py
-    # close the connection
-    conn.close()
-=======
-    sql_insert = get_insert_query(tablename, fields)
+    num_records = client.get_all('9trm-uz8i', select="count(*)")
+    num_records = int(next(num_records).get("count"))
+    print("Total of ", num_records, " to import")
+
+    ### page size = 1000 -> 33k rows/min
+    ### page size = 25k -> 20k rows/20 sec
+    ### page size = 50k -> 50k rows/38 sec
+    offset = 0
+    limit = 25000
 
     try:
-        for row in data_generator:
-            # insert into table
-            row_id = row[1]
-            query_prefix = prevent_repeat_inserts_prefix(tablename, row_id)
-            query_wrapped = "DO\n$do$\nBEGIN\n" + "\t" + query_prefix + " THEN\n\t\t" + \
-                            sql_insert + ";\n\tEND IF;\nEND\n$do$"
+        print("Inserting data")
 
-            my_data = [row.get(field, "") for field in fields]
-            cur.execute(query_wrapped, tuple(my_data)) 
+        while(offset < num_records):
+            data_generator = client.get('9trm-uz8i', select=cols_as_string,
+                                            usecodedescchar1="Commercial", istaxableparcel="Y",
+                                            order=primary_key+" DESC", limit=limit, offset=offset)
+
+            psycopg2.extras.execute_values(
+                cur,
+                insert_query,
+                [tuple([data.get(f, "") for f in fields])
+                for data in data_generator]
+            )
+
             conn.commit()
+            offset = offset + limit
+            print("offset is ", offset)
+
     except (Exception, pg.Error) as e:
             print(e)
     finally:
@@ -93,7 +113,7 @@ def clean_parcelData():
     # to see if our cleaning method is helpful
     try:
 
-        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
+        conn = pg.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
                                 user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
         cur = conn.cursor()
         #deleting rows based on anna's work 
@@ -137,4 +157,3 @@ def clean_parcelData():
         #close connection to heroku
         conn.close()
     return deletedRows
->>>>>>> 8f4bee33688791d0161b7d63a59702f8aa497c89:data/import_scripts/import_to_heroku.py
