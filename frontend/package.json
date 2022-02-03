@@ -23,7 +23,7 @@
     "client": "cd mapping-demo && npm run start",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
     "build": "npm install && cd mapping-demo && npm install && npm run buildncopy",
-    "heroku-postbuild": "ng build"
+    "heroku-postbuild": "npm run build"
   },
   "repository": {
     "type": "git",
