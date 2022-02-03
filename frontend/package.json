@@ -10,7 +10,8 @@
     "express-promise-router": "^3.0.3",
     "nodemon": "^2.0.7",
     "path": "^0.12.7",
-    "pg": "^8.0.3"
+    "pg": "^8.0.3",
+    "concurrently": "^4.1.0"
   },
   "engines": {
     "npm": "^6.4.1",
