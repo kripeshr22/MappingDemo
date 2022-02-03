@@ -14,7 +14,7 @@
     "concurrently": "^4.1.0"
   },
   "engines": {
-    "npm": "^8.1.2",
+    "npm": "^6.4.1",
     "node": "^16.13.2"
   },
   "devDependencies": {},
