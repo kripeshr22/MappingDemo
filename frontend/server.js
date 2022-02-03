@@ -16,7 +16,7 @@ const db = require('./backend/queries.js')
 
 // Use bodyParser to parse JSON
 app.use(bodyParser.json())
-app.use('/.netlify/functions/server', router);
+// app.use('/.netlify/functions/server', router);
 
 
 app.get("/server/testFunction", db.testFunction)
