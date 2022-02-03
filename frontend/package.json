@@ -19,7 +19,9 @@
   "devDependencies": {},
   "scripts": {
     "start": "nodemon server.js",
-    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy"
+    "client": "cd mapping-demo && npm run start",
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
+    "build": "npm install && cd mapping-demo && npm install && npm run predeploy"
   },
   "repository": {
     "type": "git",
