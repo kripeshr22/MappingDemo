@@ -22,7 +22,8 @@
     "start": "nodemon server.js",
     "client": "cd mapping-demo && npm run start",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
-    "build": "npm install && cd mapping-demo && npm install && npm run predeploy"
+    "build": "npm install && cd mapping-demo && npm install && npm run buildncopy",
+    "heroku-postbuild": "ng build"
   },
   "repository": {
     "type": "git",
