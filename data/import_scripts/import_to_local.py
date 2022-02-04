@@ -35,6 +35,8 @@ def import_to_table(database, tablename, fields, create_table_query):
     # for setting env variables (USER & PASSWORD): https://askubuntu.com/questions/58814/how-do-i-add-environment-variables
     #conn = connect_to_db(database, os.getenv(
     #    "USER"), os.getenv("PASSWORD"))
+
+    # USE CORRECT USER/PASS FOR YOUR COMPUTER
     conn = connect_to_db(database, "newuser", "password")
     cur = conn.cursor()
 
@@ -96,7 +98,7 @@ def import_to_table(database, tablename, fields, create_table_query):
     # some effective year built values where double digit numbers - this gets rid of them
     cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
     # some year built values where double digit numbers - this gets rid of them
-    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(effectiveyearbuilt) < 4)")
+    cur.execute("DELETE FROM " + tablename + " WHERE (LENGTH(yearbuilt) < 4)")
     conn.commit()
 
     print("closing cursor and connection")
