@@ -15,27 +15,39 @@ COLUMN = 'zipcode5'
 
 
 def main():
-    df = get_dataframe(HOST_NAME, DB_NAME, USERNAME, PW, TABLENAME, COLUMN)
+    conn = get_conn(HOST_NAME, DB_NAME, USERNAME, PW)
+    df = get_dataframe(conn, TABLENAME, COLUMN)
+    count = df.count()[COLUMN]
+
     one_hot = encode_one_hot(df)
-    hash = encode_hash(df)
+    print("encoded one hot")
+
+    hash = encode_hash(df, count)
+    print("encoded hash")
     return {"one_hot": one_hot, "hash": hash}
 
-def get_dataframe(host_name, db_name, username, pw, tablename, column):
+def get_conn(host_name, db_name, username, pw):
     # Connect to local database
     try:
-            conn = psycopg2.connect(
-                host=host_name, database=db_name, port=5432, user=username, password=pw)
-            print("successfully connected to database")
+        conn = psycopg2.connect(
+            host=host_name, database=db_name, port=5432, user=username, password=pw)
+        print("successfully connected to database")
     except:
-            print("I am unable to connect to the database")
+        print("I am unable to connect to the database")
     
+    return conn
+
+def get_dataframe(conn, tablename, column):
     # Create dataframe
-    df = pd.read_sql_query('select * from ' + tablename, con=conn)
+    # df = pd.read_sql_query('select * from ' + tablename, con=conn)
+    df = pd.read_sql_query('select distinct ' + column + ' from ' + tablename, con=conn)
+    print("selected table from database")
+
     return df
 
 
-def encode_hash(df):
-    encoder_purpose = ce.HashingEncoder(n_components=300, cols=[COLUMN])
+def encode_hash(df, count):
+    encoder_purpose = ce.HashingEncoder(n_components=count, cols=[COLUMN])
     hashlabels = encoder_purpose.fit_transform(df)
     return hashlabels
 
