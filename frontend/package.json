@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "PSQL-Express API to fetch county data",
   "main": "server.js",
+  "proxy": "https://arcane-tor-26512.herokuapp.com/",
   "dependencies": {
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
