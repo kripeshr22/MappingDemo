@@ -17,9 +17,8 @@ const Home = () => {
         try {
             const response = await fetch("/server/testGet/");
             console.log('connected!');
-            console.log(response);
+            console.log(response.json());
             const data = await response.json();
-            console.log(data);
             return data["results"];
         } catch (err) {
             console.log(err.message);
