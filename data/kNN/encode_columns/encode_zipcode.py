@@ -17,7 +17,8 @@ COLUMN = 'zipcode5'
 def main():
     conn = get_conn(HOST_NAME, DB_NAME, USERNAME, PW)
     df = get_dataframe(conn, TABLENAME, COLUMN)
-    count = df.count()[COLUMN]
+    count = df.count()[COLUMN]//50
+    print(count)
 
     one_hot = encode_one_hot(df)
     print("encoded one hot")
