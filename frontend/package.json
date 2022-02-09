@@ -20,7 +20,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "nodemon server.js",
-    "client": "cd mapping-demo && npm run start",
+    "client": "cd mapping-demo && npm run dev",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
     "build": "npm install && cd mapping-demo && npm install && npm run buildncopy",
     "heroku-postbuild": "npm run build"
