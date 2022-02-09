@@ -22,7 +22,7 @@ const Home = () => {
                     }
             });
             console.log('connected!');
-            console.log(response.clone().json());
+            console.log(response.clone());
             const data = await response.json();
             return data["results"];
         } catch (err) {
