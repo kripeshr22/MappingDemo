@@ -1,2 +1,1 @@
-server: node server.js
-web: cd mapping-demo && npm i && npm start
+web: node server.js
