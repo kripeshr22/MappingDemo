@@ -16,6 +16,7 @@ const Home = () => {
     const fetchMarkers = async () => {
         try {
             const response = await fetch("/server/testGet/");
+            console.log('connected!');
             const data = await response.json();
             return data["results"];
         } catch (err) {
@@ -39,13 +40,14 @@ const Home = () => {
         //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
         // `
         // );
+        console.log(markers);
         await markers.forEach(marker => {
-            map.addControl(new mapboxgl.Marker()
-                .setLngLat([marker.center_lon, marker.center_lat])
-                .addTo(map)
-                .setPopup(new mapboxgl.Popup({offset: 25})
-                    .setHTML(`<a>${marker.nettaxablevalue}</a>`))
-            )
+                map.addControl(new mapboxgl.Marker()
+                    .setLngLat([marker.center_lon, marker.center_lat])
+                    .addTo(map)
+                    .setPopup(new mapboxgl.Popup({offset: 25})
+                        .setHTML(`<a>${marker.nettaxablevalue}</a>`))
+                )
         });
         // map.addControl(new mapboxgl.Marker()
         //     .setLngLat([-118.3581, 34.0722])

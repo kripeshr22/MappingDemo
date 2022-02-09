@@ -2,13 +2,11 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
-// const serverless = require('serverless-http');
 const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config(); //Allows retriving variables from the .env file
 
 //Defined in .env file
-// const port = 6000 || process.env.HEROKU_URL
 const port = process.env.PORT || 6000;
 
 console.log(`PORT given to server: ${process.env.PORT}`)
@@ -18,8 +16,6 @@ const db = require('./backend/queries.js')
 
 // Use bodyParser to parse JSON
 app.use(bodyParser.json())
-// app.use('/.netlify/functions/server', router);
-
 
 app.get("/server/testFunction", db.testFunction)
 app.get("/server/testGet", db.testGet)
@@ -76,5 +72,3 @@ if(process.env.NODE_ENV == "production"){
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
 })
-
-// module.exports.handler = serverless(app);
