@@ -7,7 +7,7 @@ const path = require('path');
 require('dotenv').config(); //Allows retriving variables from the .env file
 
 //Defined in .env file
-const port = process.env.PORT || 6000;
+const port = process.env.HEROKU_URL || process.env.PORT || 6000;
 
 console.log(`PORT given to server: ${process.env.PORT}`)
 
