@@ -15,7 +15,12 @@ const Home = () => {
     const [markers, setMarkers] = useState([]);
     const fetchMarkers = async () => {
         try {
-            const response = await fetch("/server/testGet/");
+            const response = await fetch("/server/testGet/", {
+                    headers : {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+            });
             console.log('connected!');
             console.log(response.json());
             const data = await response.json();
