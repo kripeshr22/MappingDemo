@@ -7,9 +7,9 @@ const path = require('path');
 require('dotenv').config(); //Allows retriving variables from the .env file
 
 //Defined in .env file
-const port = process.env.HEROKU_URL || process.env.PORT || 6000;
+const port = process.env.PORT || 6000;
 
-console.log(`PORT given to server: ${process.env.PORT}`)
+console.log(`PORT given to server: ${process.env.PORT}`);
 
 //To get all the exported functions from queries.js, we'll 'require' the file and assign it to a variable.
 const db = require('./backend/queries.js')
