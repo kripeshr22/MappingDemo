@@ -54,7 +54,6 @@ def main():
         conn.close()
         print("Connection to database closed.")
 
-
 """ 
     connects to database 
 """
@@ -68,8 +67,7 @@ def connect_to_db(host, database, user, password):
     # cursor
     return conn
 
-
-
+  
 """ 
     Finds properties similar to the given property
     Takes in the sqft, latitude, longitude, and use code of the original property, and also the cur 
@@ -127,5 +125,4 @@ def find_worst_offenders(cur, tablename):
     # get the results and return
     results = cur.fetchall()
     return results
-
 
