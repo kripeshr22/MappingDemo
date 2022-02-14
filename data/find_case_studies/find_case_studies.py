@@ -1,21 +1,17 @@
 import psycopg2 as pg
 import csv
-
+import db_config
 
 """ 
     Finds the worst offenders, and similar properties to the worst offenders, and outputs 
     that information into the excel spreadsheet case_studies.csv
 """
 def main():
-    host = 'ec2-52-201-66-148.compute-1.amazonaws.com'
-    database='d44ns4ruujn4nq'
-    port=5432
-    user='ub5debmb55aodh'
-    password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163'
+    params = db_config.config()
     tablename = 'cleanLACountyTable'
     
     # connect to the database
-    conn = connect_to_db(host, database, user, password)
+    conn = pg.connect(**params)
     cur = conn.cursor()
 
     # get worst offenders
