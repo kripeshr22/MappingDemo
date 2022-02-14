@@ -52,20 +52,20 @@ if(process.env.NODE_ENV == "production"){
         if (error) {
             throw error;
         }
-        response.sendFile(__dirname + '/frontend/build/index.html');
+        response.sendFile(__dirname + '/build/index.html');
         //response.send("Server running on Node.js, Express, and Postgres API")
         //response.json({ info: "Server running on Node.js, Express, and Postgres API" });
     })
 
     //Static file declaration, which is the location of the React app
     //Used in deployment by React app to access index.js
-    app.use(express.static(path.join(__dirname, 'frontend/build')));
+    app.use(express.static(path.join(__dirname, 'build')));
 
     //Put this last among all routes. Otherwise, it will return HTML to all fetch requests and trip up CORS. They interrupt each other
     // For any request that doesn't match, this sends the index.html file from the client. This is used for all of our React code.
     //Eliminates need to set redirect in package.json at start script with concurrently
     app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname+'/frontend/build/index.html'));
+        res.sendFile(path.join(__dirname+'build/index.html'));
     })
 }
 
