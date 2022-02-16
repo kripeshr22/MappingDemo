@@ -2,6 +2,7 @@ import psycopg2
 from create_table import create_table_query
 from sodapy import Socrata
 from utils import profile 
+import db_config
 
 def clean_parcelData():
     #modeled after https://www.postgresqltutorial.com/postgresql-python/delete/
@@ -10,8 +11,8 @@ def clean_parcelData():
     # to see if our cleaning method is helpful
     try:
 
-        conn = psycopg2.connect(host='ec2-52-201-66-148.compute-1.amazonaws.com', database='d44ns4ruujn4nq', port=5432,
-                                user='ub5debmb55aodh', password='pe6a56f3002c3f1181d1a34e26d9a90636fdd56e1156bf39a6b8ff158a49bf163')
+        params = db_config.config()
+        conn = psycopg2.connect(**params)
         
         print("I am connected to the database")
 
