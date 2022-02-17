@@ -8,13 +8,15 @@ import mapboxgl from "!mapbox-gl";
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 mapboxgl.accessToken = token;
 
+// URL : https://arcane-tor-26512.herokuapp.com/
+
 
 const Home = () => {
     const mapContainer = useRef(null);
     const [markers, setMarkers] = useState([]);
     const fetchMarkers = async () => {
         try {
-            const response = await fetch("/server/testGet/", {
+            const response = await fetch(" https://arcane-tor-26512.herokuapp.com/server/testGet/", {
                     headers : {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
