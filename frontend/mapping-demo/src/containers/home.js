@@ -16,7 +16,7 @@ const Home = () => {
     const [markers, setMarkers] = useState([]);
     const fetchMarkers = async () => {
         try {
-            const response = await fetch(" https://arcane-tor-26512.herokuapp.com/server/testGet/", {
+            const response = await fetch("/server/testGet/", {
                     headers : {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
