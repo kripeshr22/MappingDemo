@@ -6,9 +6,8 @@ import "../styles/home.css"
 import mapboxgl from "!mapbox-gl";
 
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+const heroku = process.env.HEROKU_URL;
 mapboxgl.accessToken = token;
-
-// URL : https://arcane-tor-26512.herokuapp.com/
 
 
 const Home = () => {
