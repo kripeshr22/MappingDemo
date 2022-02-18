@@ -15,15 +15,12 @@ const Home = () => {
     const [markers, setMarkers] = useState([]);
     const fetchMarkers = async () => {
         try {
-            console.log('heroku', process.env.REACT_APP_API_URL);
             const response = await fetch(heroku+"server/testGet/", {
                     headers : {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
             });
-            console.log('connected!');
-            console.log(response.clone());
             const data = await response.json();
             return data["results"];
         } catch (err) {
@@ -47,7 +44,6 @@ const Home = () => {
         //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
         // `
         // );
-        console.log(markers);
         await markers.forEach(marker => {
                 map.addControl(new mapboxgl.Marker()
                     .setLngLat([marker.center_lon, marker.center_lat])
