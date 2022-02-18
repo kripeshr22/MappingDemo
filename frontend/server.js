@@ -4,10 +4,11 @@ const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config(); //Allows retriving variables from the .env file
 
 //Defined in .env file
-const port = process.env.HEROKU_URL || process.env.PORT || 6000;
+const port = process.env.PORT || 6000;
 
 console.log(`PORT given to server: ${process.env.PORT}`);
 console.log(`Actual Port is: ${port}`);
@@ -16,6 +17,7 @@ console.log(`Actual Port is: ${port}`);
 const db = require('./backend/queries.js')
 
 // Use bodyParser to parse JSON
+app.use(cors());
 app.use(bodyParser.json())
 
 app.get("/server/testFunction", db.testFunction)

@@ -6,7 +6,7 @@ import "../styles/home.css"
 import mapboxgl from "!mapbox-gl";
 
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-// const heroku = process.env.HEROKU_URL;
+const heroku = process.env.HEROKU_URL;
 mapboxgl.accessToken = token;
 
 
@@ -15,7 +15,9 @@ const Home = () => {
     const [markers, setMarkers] = useState([]);
     const fetchMarkers = async () => {
         try {
-            const response = await fetch("/server/testGet/", {
+            console.log('heroku',heroku);
+            console.log('public', process.env.HEROKU_URL);
+            const response = await fetch(heroku+"server/testGet/", {
                     headers : {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
