@@ -2,6 +2,7 @@ from import_to_heroku import connect_to_heroku_db, get_insert_query, prevent_rep
 from create_table import create_raw_table, csv_fields
 import csv
 import psycopg2 as pg
+import db_config
 
 
 # running script from clinic computer to import csv into heroku
