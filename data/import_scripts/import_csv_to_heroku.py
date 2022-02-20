@@ -2,7 +2,13 @@ from import_to_heroku import connect_to_heroku_db, get_insert_query, prevent_rep
 from create_table import create_raw_table, csv_fields
 import csv
 import psycopg2 as pg
-import db_config
+
+import os
+import sys
+current_dir = os.path.dirname( __file__ )
+config_dir = os.path.join( current_dir, '..', 'db_config' )
+sys.path.append( config_dir )
+import config as cf
 
 
 # running script from clinic computer to import csv into heroku

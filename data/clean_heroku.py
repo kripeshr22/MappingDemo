@@ -2,7 +2,7 @@ import psycopg2
 from create_table import create_table_query
 from sodapy import Socrata
 from utils import profile 
-import db_config
+import db_config.config as cf
 
 def clean_parcelData():
     #modeled after https://www.postgresqltutorial.com/postgresql-python/delete/
@@ -11,7 +11,7 @@ def clean_parcelData():
     # to see if our cleaning method is helpful
     try:
 
-        params = db_config.config()
+        params = cf.config()
         conn = psycopg2.connect(**params)
         
         print("I am connected to the database")
