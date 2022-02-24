@@ -19,4 +19,27 @@ def config(filename='database.ini', section='postgresql'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
-    
+
+
+def app_token(filename='database.ini', section='app_token'):
+    # create a parser
+    parser = ConfigParser()
+
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    token = ""
+    if parser.has_section(section):
+        params = parser.items(section)
+        for p in params:
+            token.append(p)
+    else:
+        raise Exception(
+            'Section {0} not found in the {1} file'.format(section, filename))
+
+    return token
+
+def datasource_info(filename='datasources.ini', section='la'):
+    info = {}
+    return info

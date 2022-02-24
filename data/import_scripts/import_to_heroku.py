@@ -7,14 +7,19 @@ import db_config
 
 import os
 import sys
+
 current_dir = os.path.dirname( __file__ )
 config_dir = os.path.join( current_dir, '..', 'db_config' )
 sys.path.append( config_dir )
 import config as cf
 
-
 def main():
-    tablename = "rawlacountytable"
+    # tablename = "rawlacountytable"
+    # primary_key = "rowID"
+    # import_from_api_to_heroku(all_fields_socrata, tablename,
+    #                           primary_key, raw_socrata_table_schema)
+
+    tablename = "rawsfcountytable"
     primary_key = "rowID"
     import_from_api_to_heroku(all_fields_socrata, tablename,
                               primary_key, raw_socrata_table_schema)
@@ -30,6 +35,12 @@ def connect_to_heroku_db():
         print("I am unable to connect to the database")
     
     return conn
+
+def get_client(county_name):
+    # get df id and endpoint root from datasources.ini
+    token = cf.app_token()
+    info = cf.datasource_info()
+
 
 # ***** connect to the db and api *******
 def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
@@ -104,7 +115,7 @@ def clean_parcelData():
     # to see if our cleaning method is helpful
     try:
 
-        params = db_config.config()
+        params = cf.config()
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         #deleting rows based on anna's work 
