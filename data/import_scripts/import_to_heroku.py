@@ -3,6 +3,13 @@ import psycopg2.extras
 from create_table import raw_socrata_table_schema, all_fields_socrata
 from sodapy import Socrata
 
+import os
+import sys
+current_dir = os.path.dirname( __file__ )
+config_dir = os.path.join( current_dir, '..', 'db_config' )
+sys.path.append( config_dir )
+import config as cf
+
 
 def main():
     tablename = "rawlacountytable"
@@ -14,7 +21,7 @@ def connect_to_heroku_db():
     conn = ""
     # connect to standard-0 heroku db
     try:
-        params = db_config.config()
+        params = cf.config()
         conn = psycopg2.connect(**params)
         print("successfully connected to database")
     except:

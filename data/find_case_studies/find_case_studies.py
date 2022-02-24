@@ -1,13 +1,19 @@
 import psycopg2 as pg
 import csv
-import db_config
+
+import os
+import sys
+current_dir = os.path.dirname( __file__ )
+config_dir = os.path.join( current_dir, '..', 'db_config' )
+sys.path.append( config_dir )
+import config as cf
 
 """ 
     Finds the worst offenders, and similar properties to the worst offenders, and outputs 
     that information into the excel spreadsheet case_studies.csv
 """
 def main():
-    params = db_config.config()
+    params = cf.config()
     tablename = 'cleanLACountyTable'
     
     # connect to the database
