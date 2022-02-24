@@ -2,6 +2,8 @@ import psycopg2 as pg
 import psycopg2.extras
 from create_table import raw_socrata_table_schema, all_fields_socrata
 from sodapy import Socrata
+import db_config
+
 
 
 def main():
