@@ -1,3 +1,4 @@
+from pkgutil import get_data
 import psycopg2 as pg
 import psycopg2.extras
 from create_table import raw_socrata_table_schema, all_fields_socrata
@@ -20,7 +21,8 @@ def main():
 
     tablename = "testtable"
     primary_key = "rowID"
-    import_from_api_to_heroku(all_fields_socrata, tablename,
+    county_name = "la"
+    import_from_api_to_heroku(all_fields_socrata, tablename, county_name,
                               primary_key, raw_socrata_table_schema)
 
 def connect_to_heroku_db():
@@ -35,20 +37,32 @@ def connect_to_heroku_db():
     
     return conn
 
-# def get_client(county_name):
-#     # get df id and endpoint root from datasources.ini
-#     token = cf.app_token()
-#     info = cf.datasource_info()
-
-
-# ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
+def get_client(county_name):
+    # get df id and endpoint root from datasources.ini
+    token = cf.app_token()
+    info = cf.datasource_info(section=county_name)
 
     client = Socrata(
-        "data.lacounty.gov",
-        app_token='8uMOnLx6S823qlm58la47e6Pd', # tech equity token for socrata api access
+        info['endpoint'],
+        # tech equity token for socrata api access
+        app_token=token,
         timeout=1000000
     )
+    return client
+
+def get_dataset_id(county_name):
+    info = cf.datasource_info(section=county_name)
+    return info['dataset_id']
+
+# ***** connect to the db and api *******
+def import_from_api_to_heroku(fields, tablename, county_name, primary_key, 
+    create_table_query="", rewrite_table=False):
+
+    # client = Socrata(
+    #     "data.lacounty.gov",
+    #     app_token='8uMOnLx6S823qlm58la47e6Pd', # tech equity token for socrata api access
+    #     timeout=1000000
+    # )
 
     conn = connect_to_heroku_db()
     if (conn == ""):
@@ -67,10 +81,11 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
 
     # Retrieve Json Data from API endpoint
     cols_as_string = ", ".join(fields)
-
     insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
+    client = get_client(county_name)
+    dataset_id = get_dataset_id(county_name)
 
-    num_records = client.get_all('9trm-uz8i', select="count(*)")
+    num_records = client.get_all(dataset_id, select="count(*)")
     num_records = int(next(num_records).get("count"))
     print("Total of ", num_records, " records attempted to insert")
 
@@ -84,7 +99,7 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
         print("Inserting data")
 
         while(offset < num_records):
-            data_generator = client.get('9trm-uz8i', select=cols_as_string,
+            data_generator = client.get(dataset_id, select=cols_as_string,
                                             usecodedescchar1="Commercial", istaxableparcel="Y",
                                             order=primary_key+" DESC", limit=limit, offset=offset)
 
