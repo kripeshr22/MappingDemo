@@ -9,16 +9,10 @@ def config(filename='database.ini', section='postgresql'):
     # read config file
     parser.read(filename)
 
-    print(f"ini file sections are : {parser.sections()}")
-
-    print(f"section is {section}")  # DEBUG #
-
     # get section, default to postgresql
     db = {}
     if parser.has_section(section):
         params = parser.items(section)
-        print(f"params are {params}")  # DEBUG #
-
         for param in params:
             db[param[0]] = param[1]
     else:
@@ -30,7 +24,6 @@ def config(filename='database.ini', section='postgresql'):
 def app_token(filename='database.ini', section='app_token'):
     print(f"from app token, section is {section}")
     token = config(filename, section)
-    print(f"token is {token}")  # DEBUG #
     return token['token']
 
 def datasource_info(filename='datasources.ini', section='la'):
