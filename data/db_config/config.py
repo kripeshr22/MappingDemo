@@ -19,4 +19,12 @@ def config(filename='database.ini', section='postgresql'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
-    
+
+
+def app_token(filename='database.ini', section='app_token'):
+    print(f"from app token, section is {section}")
+    token = config(filename, section)
+    return token['token']
+
+def datasource_info(filename='datasources.ini', section='la'):
+    return config(filename, section)

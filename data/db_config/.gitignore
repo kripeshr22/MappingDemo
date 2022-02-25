@@ -1,2 +1,3 @@
 #Ignore .ini file for Postgres database
 database.ini
+*.pyc
