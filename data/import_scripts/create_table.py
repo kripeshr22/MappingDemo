@@ -3,7 +3,7 @@
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 
 # remove last location value because redundant and dictionary type value requires extra parsing step
-raw_socrata_table_schema = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
+raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         ZIPcode VARCHAR, \
         TaxRateArea_CITY VARCHAR, \
         AIN VARCHAR, \
@@ -56,7 +56,7 @@ raw_socrata_table_schema = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable
         CENTER_LON VARCHAR \
 )"
 
-raw_csv_table_schema = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
+raw_csv_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
         ZIPcode VARCHAR, \
         TaxRateArea_CITY VARCHAR, \
         AIN VARCHAR, \
@@ -222,3 +222,107 @@ all_fields_socrata = [
     # 'location_1',
 ]
 
+
+# script to make a table w correct schema in postgresql database
+
+# importing columns as strings -> further parse datatype downstream in ETL pipelines
+
+raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
+        Closed Roll Year VARCHAR(4), \
+        Property Location VARCHAR, \
+        Parcel Number VARCHAR, \
+        Block VARCHAR, \
+        Lot VARCHAR, \
+        Volume Number VARCHAR, \
+        Use Code VARCHAR, \
+        Use Definition VARCHAR, \
+        Property Class Code VARCHAR, \
+        PProperty Class Code Definition VARCHAR, \
+        Year Property Built VARCHAR(4), \
+        Number of Bathrooms VARCHAR, \
+        Number of Bedrooms VARCHAR, \
+        Number of Rooms VARCHAR, \
+        Number of Stories VARCHAR, \
+        Number of Units VARCHAR, \
+        Zoning Code VARCHAR, \
+        Construction Type VARCHAR, \
+        Lot Depth VARCHAR, \
+        Lot Frontage VARCHAR, \
+        Property Area VARCHAR, \
+        Basement Area VARCHAR, \
+        Lot Area VARCHAR, \
+        Lot Code VARCHAR, \
+        Tax Rate Area Code VARCHAR, \
+        Percent of Ownership VARCHAR, \
+        Exemption Code VARCHAR, \
+        Exemption Code Definition VARCHAR, \
+        Status Code VARCHAR, \
+        Misc Exemption Value VARCHAR, \
+        Homeowner Exemption Value VARCHAR, \
+        Current Sales Date VARCHAR, \
+        Assessed Fixtures Value VARCHAR, \
+        Assessed Improvement Value VARCHAR, \
+        Assessed Land Value VARCHAR, \
+        Assessed Personal Property Value VARCHAR, \
+        Assessor Neighborhood District VARCHAR, \
+        Assessor Neighborhood Code VARCHAR, \
+        Assessor Neighborhood VARCHAR, \
+        Supervisor District VARCHAR, \
+        Analysis Neighborhood VARCHAR, \
+        the_geom VARCHAR, \
+        Row ID VARCHAR PRIMARY KEY, \
+)"
+
+raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
+        ZIPcode VARCHAR, \
+        TaxRateArea_CITY VARCHAR, \
+        AIN VARCHAR, \
+        RollYear VARCHAR(4), \
+        TaxRateArea VARCHAR, \
+        AssessorID VARCHAR, \
+        PropertyLocation VARCHAR, \
+        PropertyType VARCHAR, \
+        PropertyUseCode VARCHAR(4), \
+        GeneralUseType VARCHAR, \
+        SpecificUseType VARCHAR, \
+        SpecificUseDetail1 VARCHAR, \
+        SpecificUseDetail2 VARCHAR, \
+        totBuildingDataLines VARCHAR, \
+        YearBuilt VARCHAR(4), \
+        EffectiveYearBuilt VARCHAR(4), \
+        SQFTmain VARCHAR, \
+        Bedrooms VARCHAR, \
+        Bathrooms VARCHAR, \
+        Units VARCHAR, \
+        RecordingDate VARCHAR, \
+        LandValue VARCHAR, \
+        LandBaseYear VARCHAR, \
+        ImprovementValue VARCHAR, \
+        ImpBaseYear VARCHAR(4), \
+        TotalLandImpValue VARCHAR, \
+        HomeownersExemption VARCHAR, \
+        RealEstateExemption VARCHAR, \
+        FixtureValue VARCHAR, \
+        FixtureExemption VARCHAR, \
+        PersonalPropertyValue VARCHAR, \
+        PersonalPropertyExemption VARCHAR, \
+        isTaxableParcel VARCHAR(1), \
+        TotalValue VARCHAR, \
+        TotalExemption VARCHAR, \
+        netTaxableValue VARCHAR, \
+        SpecialParcelClassification VARCHAR, \
+        AdministrativeRegion VARCHAR(4), \
+        Cluster VARCHAR, \
+        ParcelBoundaryDescription VARCHAR, \
+        HouseNo VARCHAR, \
+        HouseFraction VARCHAR, \
+        StreetDirection VARCHAR, \
+        StreetName VARCHAR, \
+        UnitNo VARCHAR, \
+        City VARCHAR, \
+        ZIPcode5 VARCHAR(5), \
+        rowID VARCHAR PRIMARY KEY, \
+        CENTER_LAT VARCHAR, \
+        CENTER_LON VARCHAR, \
+        Location VARCHAR \
+)"
