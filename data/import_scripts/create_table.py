@@ -228,95 +228,95 @@ all_fields_socrata_la = [
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 
 raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        Closed Roll Year VARCHAR(4), \
-        Property Location VARCHAR, \
-        Parcel Number VARCHAR, \
+        ClosedRollYear VARCHAR(4), \
+        PropertyLocation VARCHAR, \
+        ParcelNumber VARCHAR, \
         Block VARCHAR, \
         Lot VARCHAR, \
-        Volume Number VARCHAR, \
-        Use Code VARCHAR, \
-        Use Definition VARCHAR, \
-        Property Class Code VARCHAR, \
-        PProperty Class Code Definition VARCHAR, \
-        Year Property Built VARCHAR(4), \
-        Number of Bathrooms VARCHAR, \
-        Number of Bedrooms VARCHAR, \
-        Number of Rooms VARCHAR, \
-        Number of Stories VARCHAR, \
-        Number of Units VARCHAR, \
-        Zoning Code VARCHAR, \
-        Construction Type VARCHAR, \
-        Lot Depth VARCHAR, \
-        Lot Frontage VARCHAR, \
-        Property Area VARCHAR, \
-        Basement Area VARCHAR, \
-        Lot Area VARCHAR, \
-        Lot Code VARCHAR, \
-        Tax Rate Area Code VARCHAR, \
-        Percent of Ownership VARCHAR, \
-        Exemption Code VARCHAR, \
-        Exemption Code Definition VARCHAR, \
-        Status Code VARCHAR, \
-        Misc Exemption Value VARCHAR, \
-        Homeowner Exemption Value VARCHAR, \
-        Current Sales Date VARCHAR, \
-        Assessed Fixtures Value VARCHAR, \
-        Assessed Improvement Value VARCHAR, \
-        Assessed Land Value VARCHAR, \
-        Assessed Personal Property Value VARCHAR, \
-        Assessor Neighborhood District VARCHAR, \
-        Assessor Neighborhood Code VARCHAR, \
-        Assessor Neighborhood VARCHAR, \
-        Supervisor District VARCHAR, \
-        Analysis Neighborhood VARCHAR, \
+        VolumeNumber VARCHAR, \
+        UseCode VARCHAR, \
+        UseDefinition VARCHAR, \
+        PropertyClassCode VARCHAR, \
+        PPropertyClassCodeDefinition VARCHAR, \
+        YearPropertyBuilt VARCHAR(4), \
+        NumberofBathrooms VARCHAR, \
+        NumberofBedrooms VARCHAR, \
+        NumberofRooms VARCHAR, \
+        NumberofStories VARCHAR, \
+        NumberofUnits VARCHAR, \
+        ZoningCode VARCHAR, \
+        ConstructionType VARCHAR, \
+        LotDepth VARCHAR, \
+        LotFrontage VARCHAR, \
+        PropertyArea VARCHAR, \
+        BasementArea VARCHAR, \
+        LotArea VARCHAR, \
+        LotCode VARCHAR, \
+        TaxRateAreaCode VARCHAR, \
+        PercentofOwnership VARCHAR, \
+        ExemptionCode VARCHAR, \
+        ExemptionCode Definition VARCHAR, \
+        StatusCode VARCHAR, \
+        MiscExemptionValue VARCHAR, \
+        HomeownerExemption Value VARCHAR, \
+        CurrentSalesDate VARCHAR, \
+        AssessedFixturesValue VARCHAR, \
+        AssessedImprovementValue VARCHAR, \
+        AssessedLandValue VARCHAR, \
+        AssessedPersonalPropertyValue VARCHAR, \
+        AssessorNeighborhoodDistrict VARCHAR, \
+        AssessorNeighborhoodCode VARCHAR, \
+        AssessorNeighborhood VARCHAR, \
+        SupervisorDistrict VARCHAR, \
+        AnalysisNeighborhood VARCHAR, \
         the_geom VARCHAR, \
-        Row ID VARCHAR PRIMARY KEY, \
+        RowID VARCHAR PRIMARY KEY, \
 )"
 
 raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        Closed Roll Year VARCHAR(4), \
-        Property Location VARCHAR, \
-        Parcel Number VARCHAR, \
+        ClosedRollYear VARCHAR(4), \
+        PropertyLocation VARCHAR, \
+        ParcelNumber VARCHAR, \
         Block VARCHAR, \
         Lot VARCHAR, \
-        Volume Number VARCHAR, \
-        Use Code VARCHAR, \
-        Use Definition VARCHAR, \
-        Property Class Code VARCHAR, \
-        PProperty Class Code Definition VARCHAR, \
-        Year Property Built VARCHAR(4), \
-        Number of Bathrooms VARCHAR, \
-        Number of Bedrooms VARCHAR, \
-        Number of Rooms VARCHAR, \
-        Number of Stories VARCHAR, \
-        Number of Units VARCHAR, \
-        Zoning Code VARCHAR, \
-        Construction Type VARCHAR, \
-        Lot Depth VARCHAR, \
-        Lot Frontage VARCHAR, \
-        Property Area VARCHAR, \
-        Basement Area VARCHAR, \
-        Lot Area VARCHAR, \
-        Lot Code VARCHAR, \
-        Tax Rate Area Code VARCHAR, \
-        Percent of Ownership VARCHAR, \
-        Exemption Code VARCHAR, \
-        Exemption Code Definition VARCHAR, \
-        Status Code VARCHAR, \
-        Misc Exemption Value VARCHAR, \
-        Homeowner Exemption Value VARCHAR, \
-        Current Sales Date VARCHAR, \
-        Assessed Fixtures Value VARCHAR, \
-        Assessed Improvement Value VARCHAR, \
-        Assessed Land Value VARCHAR, \
-        Assessed Personal Property Value VARCHAR, \
-        Assessor Neighborhood District VARCHAR, \
-        Assessor Neighborhood Code VARCHAR, \
-        Assessor Neighborhood VARCHAR, \
-        Supervisor District VARCHAR, \
-        Analysis Neighborhood VARCHAR, \
+        VolumeNumber VARCHAR, \
+        UseCode VARCHAR, \
+        UseDefinition VARCHAR, \
+        PropertyClassCode VARCHAR, \
+        PPropertyClassCodeDefinition VARCHAR, \
+        YearPropertyBuilt VARCHAR(4), \
+        NumberofBathrooms VARCHAR, \
+        NumberofBedrooms VARCHAR, \
+        NumberofRooms VARCHAR, \
+        NumberofStories VARCHAR, \
+        NumberofUnits VARCHAR, \
+        ZoningCode VARCHAR, \
+        ConstructionType VARCHAR, \
+        LotDepthVARCHAR, \
+        LotFrontage VARCHAR, \
+        PropertyArea VARCHAR, \
+        BasementArea VARCHAR, \
+        LotAreaVARCHAR, \
+        LotCode VARCHAR, \
+        TaxRateAreaCode VARCHAR, \
+        PercentofOwnership VARCHAR, \
+        ExemptionCode VARCHAR, \
+        ExemptionCode Definition VARCHAR, \
+        StatusCode VARCHAR, \
+        MiscExemptionValue VARCHAR, \
+        HomeownerExemptionValue VARCHAR, \
+        CurrentSalesDate VARCHAR, \
+        AssessedFixturesValue VARCHAR, \
+        AssessedImprovementValue VARCHAR, \
+        AssessedLandValue VARCHAR, \
+        AssessedPersonalPropertyValue VARCHAR, \
+        AssessorNeighborhoodDistrict VARCHAR, \
+        AssessorNeighborhoodCode VARCHAR, \
+        AssessorNeighborhood VARCHAR, \
+        SupervisorDistrict VARCHAR, \
+        AnalysisNeighborhood VARCHAR, \
         the_geom VARCHAR, \
-        Row ID VARCHAR PRIMARY KEY, \
+        RowID VARCHAR PRIMARY KEY, \
 )"
 
 # for API imports only
