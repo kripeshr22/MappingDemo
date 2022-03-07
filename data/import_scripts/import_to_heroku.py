@@ -1,7 +1,8 @@
 from pkgutil import get_data
 import psycopg2 as pg
 import psycopg2.extras
-from create_table import raw_socrata_table_schema, all_fields_socrata
+from create_table import raw_socrata_table_schema_la, \
+    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf
 from sodapy import Socrata
 
 
@@ -23,13 +24,17 @@ LIMIT = 25000
 
 def connect_to_heroku_db():
     conn = ""
+    params = cf.config()
+    if params is None:
+        return conn
+
     # connect to standard-0 heroku db
     try:
         params = cf.config()
         conn = psycopg2.connect(**params)
         print("successfully connected to database")
-    except:
-        print("I am unable to connect to the database")
+    except Exception as e: 
+        print(e)
     
     return conn
 
@@ -55,9 +60,16 @@ def get_data_generator(county_name, fields, primary_key, client, offset):
     dataset_id = get_dataset_id(county_name)
     cols_as_string = ", ".join(fields)
 
-    data_generator = client.get(dataset_id, select=cols_as_string,
-                                usecodedescchar1="Commercial", istaxableparcel="Y",
-                                order=primary_key+" DESC", limit=LIMIT, offset=offset)
+    data_generator = None
+    if county_name == 'la':
+        data_generator = client.get(dataset_id, select=cols_as_string,
+                                    usecodedescchar1="Commercial", istaxableparcel="Y",
+                                    order=primary_key+" DESC", limit=LIMIT, offset=offset)
+    if county_name == 'sf':
+        # query = f"select {cols_as_string} from "
+        data_generator = client.get(dataset_id, select=cols_as_string,
+            where="property_class_code in ('AC', 'B', 'BZ', 'C', 'C1', 'CD', 'CM')",
+            order=primary_key+" DESC", limit=LIMIT, offset=offset)
 
     return data_generator
 
@@ -94,6 +106,11 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
         print("Inserting data")
         while(offset < num_records):
             data_generator = get_data_generator(county_name, fields, primary_key, client, offset)
+            # print(data_generator[0])
+
+            # arr = [tuple([data.get(f, "") for f in fields])
+            #        for data in data_generator[0:10]]
+            # print(arr)
             psycopg2.extras.execute_values(
                 cur,
                 insert_query,
@@ -112,23 +129,25 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
         if (conn):
             cur.close()
             conn.close()
-            print("Inserted data into table. Connection closed.")
+            print("Connection closed.")
 
 
 def main():
-    tablename = "rawlacountytable"
-    primary_key = "rowID"
-    import_from_api_to_heroku(all_fields_socrata, tablename,
-                              primary_key, raw_socrata_table_schema)
+    # tablename = "rawlacountytable"
+    # primary_key = "rowID"
+    # county_name = "la"
+    # import_from_api_to_heroku(county_name, all_fields_socrata_la, tablename,
+    #                           primary_key, raw_socrata_table_schema_la)
 
     ## TODO: take these parameters in as args using argparser
     ## link schemas with tablename -> search for appropriate fields + schema
     ## in schema dictionary
-    # tablename = "testtable"
-    # primary_key = "rowID"
-    # county_name = "sf"
-    # import_from_api_to_heroku(
-    #     county_name, tablename, primary_key, all_fields_socrata, raw_socrata_table_schema, True)
+    tablename = "rawSFCountyTable"
+    primary_key = "row_id"
+    county_name = "sf"
+    import_from_api_to_heroku(
+        county_name, tablename, primary_key, all_fields_socrata_sf, \
+            raw_socrata_table_schema_sf, True)
 
 ## take in args here
 if __name__ == "__main__":

@@ -255,10 +255,10 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         TaxRateAreaCode VARCHAR, \
         PercentofOwnership VARCHAR, \
         ExemptionCode VARCHAR, \
-        ExemptionCode Definition VARCHAR, \
+        ExemptionCodeDefinition VARCHAR, \
         StatusCode VARCHAR, \
         MiscExemptionValue VARCHAR, \
-        HomeownerExemption Value VARCHAR, \
+        HomeownerExemptionValue VARCHAR, \
         CurrentSalesDate VARCHAR, \
         AssessedFixturesValue VARCHAR, \
         AssessedImprovementValue VARCHAR, \
@@ -269,8 +269,7 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         AssessorNeighborhood VARCHAR, \
         SupervisorDistrict VARCHAR, \
         AnalysisNeighborhood VARCHAR, \
-        the_geom VARCHAR, \
-        RowID VARCHAR PRIMARY KEY, \
+        RowID VARCHAR PRIMARY KEY \
 )"
 
 raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
@@ -315,8 +314,7 @@ raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable 
         AssessorNeighborhood VARCHAR, \
         SupervisorDistrict VARCHAR, \
         AnalysisNeighborhood VARCHAR, \
-        the_geom VARCHAR, \
-        RowID VARCHAR PRIMARY KEY, \
+        RowID VARCHAR PRIMARY KEY \
 )"
 
 # for API imports only
@@ -362,7 +360,6 @@ all_fields_socrata_sf = [
     'assessor_neighborhood',
     'supervisor_district',
     'analysis_neighborhood',
-    'the_geom',
     'row_id',
 ]
 
@@ -409,6 +406,5 @@ all_fields_csv_sf = [
         'Assessor Neighborhood',
         'Supervisor District',
         'Analysis Neighborhood',
-        'the_geom',
         'Row ID',
 ]
