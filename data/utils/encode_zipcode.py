@@ -1,24 +1,17 @@
-import pandas as pd
 import category_encoders as ce
-from import_scripts.import_to_heroku import *
 
+import get_data
 
-def main(encode="one_hot"):
+def main(encode="one_hot", select_cols=None):
     tablename = 'cleanlacountytable'
     encode_col = 'zipcode5'
 
-    conn = connect_to_heroku_db()
-    df = get_dataframe(conn, tablename)
+    df = get_data.get_df_from_heroku(tablename, select_cols)
 
     if encode == "hash":
         return encode_hash(df, 5, encode_col)
     if encode == "one_hot":
         return encode_one_hot(df, encode_col)
-
-def get_dataframe(conn, tablename):
-    df = pd.read_sql_query('select * from ' + tablename, con=conn)
-    print("selected table from database")
-    return df
 
 
 def encode_hash(df, count, encode_col):
@@ -32,6 +25,8 @@ def encode_one_hot(df, encode_col):
     onehotlabels = enc.fit_transform(df)
     return onehotlabels
 
+if __name__ == "__main__":
+    main()
 
 
 
