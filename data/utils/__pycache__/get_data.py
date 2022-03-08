@@ -22,3 +22,10 @@ def get_raw_df(county):
         return get_df_from_heroku("rawlacountytable")
     if county == "sf":
         return get_df_from_heroku("rawsfcountytable")
+
+def main():
+    df = get_raw_df()
+    print(df.head())
+
+if __name__ == "__main__":
+    main()
