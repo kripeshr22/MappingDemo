@@ -11,7 +11,7 @@ const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const heroku = process.env.REACT_APP_API_URL;
 mapboxgl.accessToken = token;
 
-const initialProperties = [
+const caseStudies = [
     {
         city1: "Santa Clarita",
         address1: "21070 Centre Point Parkway",
@@ -25,9 +25,43 @@ const initialProperties = [
         landvalue2: 140,
         sqft2: 7863,
         photo2: "https://images1.loopnet.com/i2/isy0EBCPWTwEHbih2zzgbauKXR_5Kg5j4jC7064O5-E/110/image.jpg",
-        center_lat: -118.2437,
-        center_lon: 34.0522,
-    }
+        center_lat: 34.41189394,
+        center_lon: -118.50415416,
+    },
+    {
+        city1: "INGLEWOOD",
+        address1: "808 E MANCHESTER BLVD ",
+        address1line2: "INGLEWOOD CA 90301",
+        landvalue1: 2.65,
+        sqft1: 5858,
+        photo1: "https://images1.loopnet.com/i2/DNlvKtX7PIRu0mGhHtaKBRdKWWmLZZ2RQoIHXOv9slM/112/image.jpg",
+        city2: "INGLEWOOD",
+        address2: "1091 LA BREA DR",
+        address2line2: "INGLEWOOD CA 90301",
+        landvalue2: 101,
+        sqft2: 5334,
+        photo2: "https://images1.loopnet.com/i2/vK1qAe_AutRnQz97e3BCS4FT8wubeRTL84IIkAmy87s/112/image.jpg",
+        id: 2,
+        center_lat: 33.9593544,
+        center_lon: -118.34498694,
+    },
+    {
+        city1: "SANTA CLARITA",
+        address1: "22750 SOLEDAD CANYON RD ",
+        address1line2: "SANTA CLARITA CA 91350",
+        landvalue1: 2.80,
+        sqft1: 12320,
+        photo1: "https://images1.loopnet.com/i2/RQYQ7SzESOShg6Vbqr5Nl8L4nyNVwBP-jX9O8P8URx0/112/image.jpg",
+        city2: "SANTA CLARITA",
+        address2: "23500 VALENCIA BLVD",
+        address2line2: "SANTA CLARITA CA 91355",
+        landvalue2: 217,
+        sqft2: 11043,
+        photo2: "https://images1.loopnet.com/i2/xlZzWi56RtfM-yRbdEz-NvzDZnK5qt7UxYNIym4K_SQ/112/23500-Valencia-Blvd-Valencia-CA-1-HighDefinition.jpg",
+        id: 3,
+        center_lat: 34.42127821,
+        center_lon: -118.53461134,
+    },
     ];
 
 
@@ -35,7 +69,6 @@ const initialProperties = [
 const Home = () => {
     const mapContainer = useRef(null);
     const [markers, setMarkers] = useState([]);
-    const [popup, setPopup] = useState(null);
     const fetchMarkers = async () => {
         try {
             const response = await fetch(heroku+"server/testGet/", {
@@ -67,25 +100,34 @@ const Home = () => {
         //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
         // `
         // );
-        await markers.forEach(marker => {
-
-            const placeholder = document.createElement('div');
-            ReactDOM.render(<CaseStudyDesign1 properties={initialProperties[0]} />, placeholder);
-
+        /* await markers.forEach(marker => {
+            // remove css styling for this one to look good
             const currentMarker = new mapboxgl.Marker()
                 .setLngLat([marker.center_lon, marker.center_lat])
                 .addTo(map)
                 .setPopup(new mapboxgl.Popup({offset: 25})
+                    .setHTML(`<a>${marker.nettaxablevalue}</a>`));
+
+
+            // map.addControl(mark)
+        }); */
+
+        await caseStudies.forEach(cs => {
+            const placeholder = document.createElement('div');
+            ReactDOM.render(<CaseStudyDesign1 properties={cs} />, placeholder);
+
+            const currentMarker = new mapboxgl.Marker()
+                .setLngLat([cs.center_lon, cs.center_lat])
+                .addTo(map)
+                .setPopup(new mapboxgl.Popup({offset: 25})
                     .setDOMContent(placeholder));
-                    // .setHTML(`<a>${marker.nettaxablevalue}</a>`));
+            // .setHTML(`<a>${marker.nettaxablevalue}</a>`));
 
 
             // map.addControl(mark)
             currentMarker.getElement().addEventListener('click', () => {
-                console.log("Clicked");
-                // setPopup(initialProperties[0]);
-                console.log(marker)})
-        });
+                console.log("Clicked")})
+        })
 
 
 
