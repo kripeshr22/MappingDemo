@@ -5,19 +5,13 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import encode_columns.encode_zipcode 
+import os, sys
 
+current_dir = os.path.dirname(__file__)
+import_dir = os.path.join(current_dir, '..', 'utils')
+sys.path.append(import_dir)
+import encode_zipcode as encode
 
-def main():
-    hash_df = get_hash_df()
-    run_knn(hash_df)
-
-def get_hash_df():
-    return encode_columns.encode_zipcode.main("hash")
-
-
-def get_one_hot_df():
-    return encode_columns.encode_zipcode.main()
 
 def run_knn(df):
     # get encoded table
@@ -120,3 +114,14 @@ def run_knn(df):
 
     plt.title("Predictions of current land value per square foot if properties were assessed in 2021")
     plt.show()
+
+
+def main():
+    select_cols = ['landbaseyear','center_lat', 'center_lon', 'yearbuilt', 'effectiveyearbuilt',
+        'landvalue','sqftmain', 'zipcode5']
+    hash_df = encode.main("hash", select_cols)
+                           
+    run_knn(hash_df)
+
+if __name__ == "__main__":
+    main()
