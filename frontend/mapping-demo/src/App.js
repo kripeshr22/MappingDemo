@@ -7,6 +7,7 @@ import Map2 from './containers/map2'
 
 import NavigationBar from './components/nav_bar'
 import { Route, Redirect, Switch, HashRouter } from 'react-router-dom'
+import CaseStudies from "./containers/caseStudies";
 
 function App() {
   return (
@@ -20,10 +21,12 @@ function App() {
         <Route path='/home' component={Home}></Route>
         <Route path='/map2' component={Map2}></Route>
         <Route path='/about' component={About}></Route>
+          <Route path='/case-studies' component={CaseStudies}></Route>
         <Home>
         </Home>
         <About></About>
         <Map2></Map2>
+          <CaseStudies></CaseStudies>
       </Switch>
       </HashRouter>
     </div>
