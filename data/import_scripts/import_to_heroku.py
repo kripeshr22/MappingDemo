@@ -1,44 +1,89 @@
+from pkgutil import get_data
 import psycopg2 as pg
 import psycopg2.extras
-from create_table import raw_socrata_table_schema, all_fields_socrata
+from create_table import raw_socrata_table_schema_la, \
+    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf
 from sodapy import Socrata
 
 
-def main():
-    tablename = "rawlacountytable"
-    primary_key = "rowID"
-    import_from_api_to_heroku(all_fields_socrata, tablename,
-                              primary_key, raw_socrata_table_schema)
+import os
+import sys
+
+current_dir = os.path.dirname( __file__ )
+config_dir = os.path.join( current_dir, '..', 'db_config' )
+sys.path.append( config_dir )
+import config as cf
+
+
+### page size = 1000 -> 33k rows/min
+### page size = 25k -> 50k rows/50 sec
+### page size = 50k -> 50k rows/38 sec
+## TODO: is this the best way to specify limit? maybe put in config file (with offset) 
+# + pull variable
+LIMIT = 25000 
 
 def connect_to_heroku_db():
     conn = ""
+    params = cf.config()
+    if params is None:
+        return conn
+
     # connect to standard-0 heroku db
     try:
-        params = db_config.config()
+        params = cf.config()
         conn = psycopg2.connect(**params)
         print("successfully connected to database")
-    except:
-        print("I am unable to connect to the database")
+    except Exception as e: 
+        print(e)
     
     return conn
 
-# ***** connect to the db and api *******
-def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query="", rewrite_table=False):
+def get_client(county_name):
+    # get df id and endpoint root from datasources.ini
+    token = cf.app_token()
+    info = cf.datasource_info(section=county_name)
 
     client = Socrata(
-        "data.lacounty.gov",
-        app_token='8uMOnLx6S823qlm58la47e6Pd', # tech equity token for socrata api access
+        info['endpoint'],
+        # tech equity token for socrata api access
+        app_token=token,
         timeout=1000000
     )
+    return client
+
+def get_dataset_id(county_name):
+    info = cf.datasource_info(section=county_name)
+    return info['dataset_id']
+
+
+def get_data_generator(county_name, fields, primary_key, client, offset):
+    dataset_id = get_dataset_id(county_name)
+    cols_as_string = ", ".join(fields)
+
+    data_generator = None
+    if county_name == 'la':
+        data_generator = client.get(dataset_id, select=cols_as_string,
+                                    usecodedescchar1="Commercial", istaxableparcel="Y",
+                                    order=primary_key+" DESC", limit=LIMIT, offset=offset)
+    if county_name == 'sf':
+        # query = f"select {cols_as_string} from "
+        data_generator = client.get(dataset_id, select=cols_as_string,
+            where="property_class_code in ('AC', 'B', 'BZ', 'C', 'C1', 'CD', 'CM')",
+            order=primary_key+" DESC", limit=LIMIT, offset=offset)
+
+    return data_generator
+
+# ***** connect to the db and api *******
+def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
+    create_table_query="", rewrite_table=False):
 
     conn = connect_to_heroku_db()
     if (conn == ""):
         return
 
-    # cursor
     cur = conn.cursor()
 
-    # rewriting entire table 
+    # rewriting entire table if flagged
     if rewrite_table:
         cur.execute("DROP TABLE IF EXISTS " + tablename)
         cur.execute(create_table_query)
@@ -47,28 +92,25 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
 
 
     # Retrieve Json Data from API endpoint
-    cols_as_string = ", ".join(fields)
-
     insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
+    client = get_client(county_name)
+    dataset_id = get_dataset_id(county_name)
 
-    num_records = client.get_all('9trm-uz8i', select="count(*)")
+    ## TODO: put this in a log file instead of printing
+    num_records = client.get_all(dataset_id, select="count(*)")
     num_records = int(next(num_records).get("count"))
     print("Total of ", num_records, " records attempted to insert")
 
-    ### page size = 1000 -> 33k rows/min
-    ### page size = 25k -> 50k rows/50 sec
-    ### page size = 50k -> 50k rows/38 sec
     offset = 0
-    limit = 25000
-
     try:
         print("Inserting data")
-
         while(offset < num_records):
-            data_generator = client.get('9trm-uz8i', select=cols_as_string,
-                                            usecodedescchar1="Commercial", istaxableparcel="Y",
-                                            order=primary_key+" DESC", limit=limit, offset=offset)
+            data_generator = get_data_generator(county_name, fields, primary_key, client, offset)
+            # print(data_generator[0])
 
+            # arr = [tuple([data.get(f, "") for f in fields])
+            #        for data in data_generator[0:10]]
+            # print(arr)
             psycopg2.extras.execute_values(
                 cur,
                 insert_query,
@@ -77,7 +119,8 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
             )
 
             conn.commit()
-            offset = offset + limit
+            offset = offset + LIMIT
+            ## TODO: print this into a log file instead of to terminal
             print("offset is ", offset)
 
     except (Exception, pg.Error) as e:
@@ -86,56 +129,26 @@ def import_from_api_to_heroku(fields, tablename, primary_key, create_table_query
         if (conn):
             cur.close()
             conn.close()
-            print("Inserted data into table. Connection closed.")
-
-def clean_parcelData():
-    #modeled after https://www.postgresqltutorial.com/postgresql-python/delete/
-    conn = None
-    #we can keep track of how many rows we're deleting 
-    # to see if our cleaning method is helpful
-    try:
-
-        params = db_config.config()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
-        #deleting rows based on anna's work 
-        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType = 'Residential' ")
-        cur.execute("DELETE FROM rawParcelData WHERE GeneralUseType is null")
-        cur.execute("DELETE FROM rawParcelData WHERE isTaxableParcel? = 'N' ")
-        cur.execute("DELETE FROM rawParcelData WHERE ZIPcode5 is null")
-        cur.execute("DELETE FROM rawParcelData WHERE RollYear is null")
-        cur.execute("DELETE FROM rawParcelData WHERE LandBaseYear is null")
-        cur.execute("DELETE FROM rawParcelData WHERE LandValue is null")
-        cur.execute("DELETE FROM rawParcelData WHERE SQFTmain = '0' ")
-        cur.execute("DELETE FROM rawParcelData WHERE rowID is null")
-        cur.execute("DELETE FROM rawParcelData WHERE Location 1 = '(0.0°, 0.0°)'")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LON = '0'")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT = '0'")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
-        cur.execute("DELETE FROM rawParcelData WHERE CENTER_LAT is null")
-        cur.execute("UPDATE rawParcelData SET sqftmain = REPLACE(sqftmain, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_landvalue = REPLACE(roll_landvalue, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_impvalue = REPLACE(roll_impvalue, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_totlandimp = REPLACE(roll_totlandimp, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_realestateexemp = REPLACE(roll_realestateexemp, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_fixturevalue = REPLACE(roll_fixturevalue, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_fixtureexemp = REPLACE(roll_fixtureexemp, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_perspropvalue = REPLACE(roll_perspropvalue, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_perspropexemp = REPLACE(roll_perspropexemp, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_totalvalue = REPLACE(roll_totalvalue, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET roll_totalexemption = REPLACE(roll_totalexemption, ‘,’, ‘’)")
-        cur.execute("UPDATE rawParcelData SET nettaxablevalue = REPLACE(nettaxablevalue, ‘,’, ‘’)")
+            print("Connection closed.")
 
 
-        #updating our number of deleted rows based on what we removed
-        deletedRows = cur.rowcount
-        #save changes to the database
-        conn.commit()
-        #close cursor
-        cur.close()
-    except:
-        print("I am unable to connect to the database")
-    finally:
-        #close connection to heroku
-        conn.close()
-    return deletedRows
+def main():
+    # tablename = "rawlacountytable"
+    # primary_key = "rowID"
+    # county_name = "la"
+    # import_from_api_to_heroku(county_name, all_fields_socrata_la, tablename,
+    #                           primary_key, raw_socrata_table_schema_la)
+
+    ## TODO: take these parameters in as args using argparser
+    ## link schemas with tablename -> search for appropriate fields + schema
+    ## in schema dictionary
+    tablename = "rawSFCountyTable"
+    primary_key = "row_id"
+    county_name = "sf"
+    import_from_api_to_heroku(
+        county_name, tablename, primary_key, all_fields_socrata_sf, \
+            raw_socrata_table_schema_sf, True)
+
+## take in args here
+if __name__ == "__main__":
+    main()
