@@ -3,11 +3,18 @@
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 
 # remove last location value because redundant and dictionary type value requires extra parsing step
+
+# some notes on changed vars:
+# ain/rowid - cant fit in INT, so I left it as a VARCHAR. it could be a BIGINT (not sure which is better)
+# looked into dates - doesnt look like theres a year option so I didn't end up using it (and used ints instead)
+# did use date for recording date since in correct format
+# money type takes in $1,000.00 type form - used for money stuff
+
 raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
-        ZIPcode VARCHAR, \
+        ZIPcode INT, \
         TaxRateArea_CITY VARCHAR, \
         AIN VARCHAR, \
-        RollYear VARCHAR(4), \
+        RollYear INT(4), \
         TaxRateArea VARCHAR, \
         AssessorID VARCHAR, \
         PropertyLocation VARCHAR, \
@@ -18,28 +25,28 @@ raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTa
         SpecificUseDetail1 VARCHAR, \
         SpecificUseDetail2 VARCHAR, \
         totBuildingDataLines VARCHAR, \
-        YearBuilt VARCHAR(4), \
-        EffectiveYearBuilt VARCHAR(4), \
-        SQFTmain VARCHAR, \
+        YearBuilt INT(4), \
+        EffectiveYearBuilt INT(4), \
+        SQFTmain INT, \
         Bedrooms VARCHAR, \
         Bathrooms VARCHAR, \
         Units VARCHAR, \
-        RecordingDate VARCHAR, \
-        LandValue VARCHAR, \
-        LandBaseYear VARCHAR, \
-        ImprovementValue VARCHAR, \
-        ImpBaseYear VARCHAR(4), \
-        TotalLandImpValue VARCHAR, \
-        HomeownersExemption VARCHAR, \
-        RealEstateExemption VARCHAR, \
-        FixtureValue VARCHAR, \
-        FixtureExemption VARCHAR, \
-        PersonalPropertyValue VARCHAR, \
-        PersonalPropertyExemption VARCHAR, \
+        RecordingDate DATE, \
+        LandValue MONEY, \
+        LandBaseYear INT, \
+        ImprovementValue MONEY, \
+        ImpBaseYear INT(4), \
+        TotalLandImpValue MONEY, \
+        HomeownersExemption MONEY, \
+        RealEstateExemption MONEY, \
+        FixtureValue MONEY, \
+        FixtureExemption MONEY, \
+        PersonalPropertyValue MONEY, \
+        PersonalPropertyExemption MONEY, \
         isTaxableParcel VARCHAR(1), \
-        TotalValue VARCHAR, \
-        TotalExemption VARCHAR, \
-        netTaxableValue VARCHAR, \
+        TotalValue MONEY, \
+        TotalExemption MONEY, \
+        netTaxableValue MONEY, \
         SpecialParcelClassification VARCHAR, \
         AdministrativeRegion VARCHAR(4), \
         Cluster VARCHAR, \
@@ -50,17 +57,17 @@ raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTa
         StreetName VARCHAR, \
         UnitNo VARCHAR, \
         City VARCHAR, \
-        ZIPcode5 VARCHAR(5), \
+        ZIPcode5 INT(5), \
         rowID VARCHAR PRIMARY KEY, \
         CENTER_LAT VARCHAR, \
         CENTER_LON VARCHAR \
 )"
 
 raw_csv_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
-        ZIPcode VARCHAR, \
+        ZIPcode INT, \
         TaxRateArea_CITY VARCHAR, \
         AIN VARCHAR, \
-        RollYear VARCHAR(4), \
+        RollYear INT(4), \
         TaxRateArea VARCHAR, \
         AssessorID VARCHAR, \
         PropertyLocation VARCHAR, \
@@ -71,28 +78,28 @@ raw_csv_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable 
         SpecificUseDetail1 VARCHAR, \
         SpecificUseDetail2 VARCHAR, \
         totBuildingDataLines VARCHAR, \
-        YearBuilt VARCHAR(4), \
-        EffectiveYearBuilt VARCHAR(4), \
-        SQFTmain VARCHAR, \
+        YearBuilt INT(4), \
+        EffectiveYearBuilt INT(4), \
+        SQFTmain INT, \
         Bedrooms VARCHAR, \
         Bathrooms VARCHAR, \
         Units VARCHAR, \
-        RecordingDate VARCHAR, \
-        LandValue VARCHAR, \
-        LandBaseYear VARCHAR, \
-        ImprovementValue VARCHAR, \
-        ImpBaseYear VARCHAR(4), \
-        TotalLandImpValue VARCHAR, \
-        HomeownersExemption VARCHAR, \
-        RealEstateExemption VARCHAR, \
-        FixtureValue VARCHAR, \
-        FixtureExemption VARCHAR, \
-        PersonalPropertyValue VARCHAR, \
-        PersonalPropertyExemption VARCHAR, \
+        RecordingDate DATE, \
+        LandValue MONEY, \
+        LandBaseYear INT, \
+        ImprovementValue MONEY, \
+        ImpBaseYear INT(4), \
+        TotalLandImpValue MONEY, \
+        HomeownersExemption MONEY, \
+        RealEstateExemption MONEY, \
+        FixtureValue MONEY, \
+        FixtureExemption MONEY, \
+        PersonalPropertyValue MONEY, \
+        PersonalPropertyExemption MONEY, \
         isTaxableParcel VARCHAR(1), \
-        TotalValue VARCHAR, \
-        TotalExemption VARCHAR, \
-        netTaxableValue VARCHAR, \
+        TotalValue MONEY, \
+        TotalExemption MONEY, \
+        netTaxableValue MONEY, \
         SpecialParcelClassification VARCHAR, \
         AdministrativeRegion VARCHAR(4), \
         Cluster VARCHAR, \
@@ -103,7 +110,7 @@ raw_csv_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable 
         StreetName VARCHAR, \
         UnitNo VARCHAR, \
         City VARCHAR, \
-        ZIPcode5 VARCHAR(5), \
+        ZIPcode5 INT(5), \
         rowID VARCHAR PRIMARY KEY, \
         CENTER_LAT VARCHAR, \
         CENTER_LON VARCHAR, \
@@ -228,7 +235,7 @@ all_fields_socrata_la = [
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 
 raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        ClosedRollYear VARCHAR(4), \
+        ClosedRollYear INT(4), \
         PropertyLocation VARCHAR, \
         ParcelNumber VARCHAR, \
         Block VARCHAR, \
@@ -238,7 +245,7 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         UseDefinition VARCHAR, \
         PropertyClassCode VARCHAR, \
         PPropertyClassCodeDefinition VARCHAR, \
-        YearPropertyBuilt VARCHAR(4), \
+        YearPropertyBuilt INT(4), \
         NumberofBathrooms VARCHAR, \
         NumberofBedrooms VARCHAR, \
         NumberofRooms VARCHAR, \
@@ -248,22 +255,22 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         ConstructionType VARCHAR, \
         LotDepth VARCHAR, \
         LotFrontage VARCHAR, \
-        PropertyArea VARCHAR, \
-        BasementArea VARCHAR, \
-        LotArea VARCHAR, \
+        PropertyArea INT, \
+        BasementArea INT, \
+        LotArea INT, \
         LotCode VARCHAR, \
         TaxRateAreaCode VARCHAR, \
         PercentofOwnership VARCHAR, \
         ExemptionCode VARCHAR, \
         ExemptionCodeDefinition VARCHAR, \
         StatusCode VARCHAR, \
-        MiscExemptionValue VARCHAR, \
-        HomeownerExemptionValue VARCHAR, \
-        CurrentSalesDate VARCHAR, \
-        AssessedFixturesValue VARCHAR, \
-        AssessedImprovementValue VARCHAR, \
-        AssessedLandValue VARCHAR, \
-        AssessedPersonalPropertyValue VARCHAR, \
+        MiscExemptionValue MONEY, \
+        HomeownerExemptionValue MONEY, \
+        CurrentSalesDate DATE, \
+        AssessedFixturesValue MONEY, \
+        AssessedImprovementValue MONEY, \
+        AssessedLandValue MONEY, \
+        AssessedPersonalPropertyValue MONEY, \
         AssessorNeighborhoodDistrict VARCHAR, \
         AssessorNeighborhoodCode VARCHAR, \
         AssessorNeighborhood VARCHAR, \
@@ -273,7 +280,7 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
 )"
 
 raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        ClosedRollYear VARCHAR(4), \
+        ClosedRollYear INT(4), \
         PropertyLocation VARCHAR, \
         ParcelNumber VARCHAR, \
         Block VARCHAR, \
@@ -283,7 +290,7 @@ raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable 
         UseDefinition VARCHAR, \
         PropertyClassCode VARCHAR, \
         PPropertyClassCodeDefinition VARCHAR, \
-        YearPropertyBuilt VARCHAR(4), \
+        YearPropertyBuilt INT(4), \
         NumberofBathrooms VARCHAR, \
         NumberofBedrooms VARCHAR, \
         NumberofRooms VARCHAR, \
@@ -293,22 +300,22 @@ raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable 
         ConstructionType VARCHAR, \
         LotDepthVARCHAR, \
         LotFrontage VARCHAR, \
-        PropertyArea VARCHAR, \
-        BasementArea VARCHAR, \
-        LotAreaVARCHAR, \
+        PropertyArea INT, \
+        BasementArea INT, \
+        LotArea INT, \
         LotCode VARCHAR, \
         TaxRateAreaCode VARCHAR, \
         PercentofOwnership VARCHAR, \
         ExemptionCode VARCHAR, \
         ExemptionCode Definition VARCHAR, \
         StatusCode VARCHAR, \
-        MiscExemptionValue VARCHAR, \
-        HomeownerExemptionValue VARCHAR, \
-        CurrentSalesDate VARCHAR, \
-        AssessedFixturesValue VARCHAR, \
-        AssessedImprovementValue VARCHAR, \
-        AssessedLandValue VARCHAR, \
-        AssessedPersonalPropertyValue VARCHAR, \
+        MiscExemptionValue MONEY, \
+        HomeownerExemptionValue MONEY, \
+        CurrentSalesDate DATE, \
+        AssessedFixturesValue MONEY, \
+        AssessedImprovementValue MONEY, \
+        AssessedLandValue MONEY, \
+        AssessedPersonalPropertyValue MONEY, \
         AssessorNeighborhoodDistrict VARCHAR, \
         AssessorNeighborhoodCode VARCHAR, \
         AssessorNeighborhood VARCHAR, \
