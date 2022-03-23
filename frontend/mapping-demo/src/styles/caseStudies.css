@@ -33,7 +33,6 @@
     /*width: 80%;*/
     flex: 1 1 0;
     /*height: 90%;*/
-
 }
 
 .case-study-property-address {
@@ -48,10 +47,10 @@
     flex: 1 1 0px;
 }
 
-img {
-    /*max-height:100%;*/
-    /*max-width:100%;*/
-    /*object-fit: contain;*/
+.image {
+    height: 230px;
+    width: 320px;
+    overflow: hidden;
 }
 
 

@@ -27,7 +27,7 @@ function Property(props) {
         <div>
             <div className={"case-study-property"}>
                 <div className={"case-study-property-address"}>{props.address} <br/> {props.addressline2}</div>
-                <img src={props.photo} alt={"property"}/>
+                <div className={"image"}><img src={props.photo} alt={"property"}/></div>
 
                 <div className={"case-study-property-address"}>{props.sqft} sqft</div>
                 <div className={"case-study-property-address"}>Land valued at {props.landvalue} $/sqft</div>
