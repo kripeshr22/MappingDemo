@@ -37,3 +37,25 @@
       width: inherit;
       margin-bottom: 20px;
   }
+
+.marker {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.red {
+    background: red;
+}
+
+.green {
+    background: green;
+}
+.mapboxgl-popup {
+    max-width: 200px;
+}
+.mapboxgl-popup-content {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+}
