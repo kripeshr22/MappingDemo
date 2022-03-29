@@ -10,32 +10,32 @@
 # did use date for recording date since in correct format
 # money type takes in $1,000.00 type form - used for money stuff
 
-raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTable ( \
-        ZIPcode INT, \
+raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawlacountytable2 ( \
+        ZIPcode VARCHAR, \
         TaxRateArea_CITY VARCHAR, \
         AIN VARCHAR, \
-        RollYear INT(4), \
+        RollYear INT, \
         TaxRateArea VARCHAR, \
         AssessorID VARCHAR, \
         PropertyLocation VARCHAR, \
         PropertyType VARCHAR, \
-        PropertyUseCode VARCHAR(4), \
+        PropertyUseCode VARCHAR, \
         GeneralUseType VARCHAR, \
         SpecificUseType VARCHAR, \
         SpecificUseDetail1 VARCHAR, \
         SpecificUseDetail2 VARCHAR, \
         totBuildingDataLines VARCHAR, \
-        YearBuilt INT(4), \
-        EffectiveYearBuilt INT(4), \
+        YearBuilt INT, \
+        EffectiveYearBuilt INT, \
         SQFTmain INT, \
         Bedrooms VARCHAR, \
         Bathrooms VARCHAR, \
         Units VARCHAR, \
-        RecordingDate DATE, \
+        RecordingDate VARCHAR, \
         LandValue MONEY, \
         LandBaseYear INT, \
         ImprovementValue MONEY, \
-        ImpBaseYear INT(4), \
+        ImpBaseYear INT, \
         TotalLandImpValue MONEY, \
         HomeownersExemption MONEY, \
         RealEstateExemption MONEY, \
@@ -57,7 +57,7 @@ raw_socrata_table_schema_la = "CREATE UNLOGGED TABLE IF NOT EXISTS rawLACountyTa
         StreetName VARCHAR, \
         UnitNo VARCHAR, \
         City VARCHAR, \
-        ZIPcode5 INT(5), \
+        ZIPcode5 VARCHAR(5), \
         rowID VARCHAR PRIMARY KEY, \
         CENTER_LAT VARCHAR, \
         CENTER_LON VARCHAR \
@@ -234,8 +234,8 @@ all_fields_socrata_la = [
 
 # importing columns as strings -> further parse datatype downstream in ETL pipelines
 
-raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        ClosedRollYear INT(4), \
+raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawsfcountytable2 ( \
+        ClosedRollYear INT, \
         PropertyLocation VARCHAR, \
         ParcelNumber VARCHAR, \
         Block VARCHAR, \
@@ -244,8 +244,8 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         UseCode VARCHAR, \
         UseDefinition VARCHAR, \
         PropertyClassCode VARCHAR, \
-        PPropertyClassCodeDefinition VARCHAR, \
-        YearPropertyBuilt INT(4), \
+        PropertyClassCodeDefinition VARCHAR, \
+        YearPropertyBuilt VARCHAR, \
         NumberofBathrooms VARCHAR, \
         NumberofBedrooms VARCHAR, \
         NumberofRooms VARCHAR, \
@@ -255,9 +255,9 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         ConstructionType VARCHAR, \
         LotDepth VARCHAR, \
         LotFrontage VARCHAR, \
-        PropertyArea INT, \
-        BasementArea INT, \
-        LotArea INT, \
+        PropertyArea NUMERIC, \
+        BasementArea NUMERIC, \
+        LotArea NUMERIC, \
         LotCode VARCHAR, \
         TaxRateAreaCode VARCHAR, \
         PercentofOwnership VARCHAR, \
@@ -266,7 +266,7 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
         StatusCode VARCHAR, \
         MiscExemptionValue MONEY, \
         HomeownerExemptionValue MONEY, \
-        CurrentSalesDate DATE, \
+        CurrentSalesDate VARCHAR, \
         AssessedFixturesValue MONEY, \
         AssessedImprovementValue MONEY, \
         AssessedLandValue MONEY, \
@@ -280,7 +280,7 @@ raw_socrata_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTa
 )"
 
 raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable ( \
-        ClosedRollYear INT(4), \
+        ClosedRollYear INT, \
         PropertyLocation VARCHAR, \
         ParcelNumber VARCHAR, \
         Block VARCHAR, \
@@ -289,8 +289,8 @@ raw_csv_table_schema_sf = "CREATE UNLOGGED TABLE IF NOT EXISTS rawSFCountyTable 
         UseCode VARCHAR, \
         UseDefinition VARCHAR, \
         PropertyClassCode VARCHAR, \
-        PPropertyClassCodeDefinition VARCHAR, \
-        YearPropertyBuilt INT(4), \
+        PropertyClassCodeDefinition VARCHAR, \
+        YearPropertyBuilt INT, \
         NumberofBathrooms VARCHAR, \
         NumberofBedrooms VARCHAR, \
         NumberofRooms VARCHAR, \

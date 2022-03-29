@@ -111,6 +111,7 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
             # arr = [tuple([data.get(f, "") for f in fields])
             #        for data in data_generator[0:10]]
             # print(arr)
+            print("data generated")
             psycopg2.extras.execute_values(
                 cur,
                 insert_query,
@@ -133,22 +134,26 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
 
 
 def main():
-    # tablename = "rawlacountytable"
-    # primary_key = "rowID"
-    # county_name = "la"
-    # import_from_api_to_heroku(county_name, all_fields_socrata_la, tablename,
-    #                           primary_key, raw_socrata_table_schema_la)
+    tablename = "rawlacountytable2"
+    primary_key = "rowID"
+    county_name = "la"
+    import_from_api_to_heroku(
+        county_name,  tablename, primary_key, 
+        all_fields_socrata_la, raw_socrata_table_schema_la, True)
 
     ## TODO: take these parameters in as args using argparser
     ## link schemas with tablename -> search for appropriate fields + schema
     ## in schema dictionary
-    tablename = "rawSFCountyTable"
-    primary_key = "row_id"
-    county_name = "sf"
-    import_from_api_to_heroku(
-        county_name, tablename, primary_key, all_fields_socrata_sf, \
-            raw_socrata_table_schema_sf, True)
+    # tablename = "rawsfcountytable2"
+    # primary_key = "row_id"
+    # county_name = "sf"
+    # import_from_api_to_heroku(
+    #     county_name, tablename, primary_key, all_fields_socrata_sf, \
+    #         raw_socrata_table_schema_sf, True)
 
 ## take in args here
 if __name__ == "__main__":
     main()
+
+
+# set default value thats obv wrong?
