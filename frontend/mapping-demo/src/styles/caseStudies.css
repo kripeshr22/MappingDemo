@@ -9,7 +9,7 @@
     background-color: lightblue;
     /*height: 48%;*/
     /*width: 48%;*/
-    height: 420px;
+    height: 440px;
     width: 680px;
     font-family: sans-serif;
     padding: 10px;
@@ -53,5 +53,15 @@
     overflow: hidden;
 }
 
+.image-credit {
+    color: cornflowerblue;
+    font-size: smaller;
+    margin-top: 5px;
 
+}
 
+a {
+    /*color: lightblue;*/
+    font-size: medium;
+    font-weight: normal;
+}
