@@ -3,6 +3,12 @@ import os, sys
 import pandas as pd
 import statistics
 import datetime
+import collections
+
+current_dir = os.path.dirname(__file__)
+import_dir = os.path.join(current_dir, '..', 'import_scripts')
+sys.path.append(import_dir)
+import import_to_heroku
 
 current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'utils')
@@ -11,14 +17,15 @@ import get_data
 
 
 class Estimator:
-    def __init__(self, county, prop_id, rebase_year, row_year, region, value):
+    def __init__(self, county, prop_id, rebase_year, roll_year, region, value):
         self.county = county
         self.prop_id = prop_id
         self.rebase_year = rebase_year
-        self.row_year = row_year
+        self.roll_year = roll_year
         self.region = region
         self.value = value
-        self.columns = [prop_id, rebase_year, row_year, region, value]
+        self.columns = [prop_id, rebase_year, roll_year, region, value]
+        self.current_year = datetime.datetime.now().year
 
     def get_df(self):
         """get df + format columns from input df: currently for la county only"""
@@ -41,11 +48,13 @@ class Estimator:
         (no reported growth) with previous year's growth
         2. Fill in all years until today's year
         """
-        today = datetime.datetime.now()
+        if len(growth_map) == 0:
+            return growth_map
+
         min_year = min(growth_map)
         prev_year = -1
-        for year in range(min_year, today.year):
-            if prev_year == -1:
+        for year in range(min_year, self.current_year):
+            if prev_year < 0:
                 prev_year = year
                 continue
 
@@ -67,56 +76,53 @@ class Estimator:
         """
         counter = {}
 
-        # get all properties in region and iterate through each property
+        # iterate through each property and get growth
         ids = region_df[self.prop_id].unique()
         for id in ids:
-            prop_df = self.df.loc[self.df[self.prop_id] == id]
+            prop_df = region_df.loc[region_df[self.prop_id] == id]
 
-            # order from oldest to latest value update
-            prop_df.sort_values(by=[self.rebase_year, self.row_year], inplace=True)
-            rebase_years = prop_df[self.rebase_year].unique()
+            # only use re-assessed values to calculate growth
+            prop_df = prop_df.loc[prop_df[self.rebase_year] == prop_df[self.roll_year]]
+            prop_df = prop_df.sort_values(self.rebase_year) 
+            prop_df = prop_df.reset_index()
 
             # if property has never been re-assessed, skip property
-            if len(rebase_years) <= 1:
+            if len(prop_df) < 2:
                 continue
 
-            prev_year = prop_df[self.rebase_year].iloc[0]
-            prev_value = prop_df[self.value].iloc[0]
-
-            # calculate avg % growth between re-assessed property values
-            for index in range(1, self.df.shape[0]):
-                curr_year = self.df[self.rebase_year].iloc[index]
-                curr_value = self.df[self.value].iloc[index]
-
-                # if value was re-evaluated
-                if curr_year > prev_year:
-                    # calculate % increase between those years
-                    diff_years = curr_year - prev_year
-                    compound_incr = pow(curr_value/prev_value, 1/diff_years) - 1
-
-                    counter = self.increase_counter(
-                        counter, prev_year, curr_year, compound_incr)
-                    
+            # iterate through re-assessed years
+            for index, row in prop_df.iterrows():
+                curr_year = row[self.rebase_year]
+                curr_value = row[self.value]
+                if index == 0:
                     prev_year = curr_year
                     prev_value = curr_value
+                    continue
+                # value growth between re-assessment years
+                diff_years = curr_year - prev_year
+                compound_incr = pow(curr_value/prev_value, 1/diff_years)
+                counter = self.increase_counter(
+                    counter, prev_year, curr_year, compound_incr)
 
+                prev_year = curr_year
+                prev_value = curr_value
+            
         # compute and return growth map for region
         growth_map = self.average_counter(counter)
         return self.normalize_growth_map(growth_map)
-
 
     def increase_counter(self, counter, start_year, end_year, perc):
         """
         add growth percentage to counter between start and end years
         """
-        for i in range(start_year, end_year):
+        for i in range(int(start_year), int(end_year)):
             if i in counter.keys():
                 arr = counter.get(i)
                 arr.append(perc)
             else:
                 counter[i] = [perc]
         return counter
-
+    
     def get_growth_by_region(self):
         """
         get growth map for each region
@@ -132,7 +138,6 @@ class Estimator:
             growth_map = self.get_growth_map(region_df)
             growth_map = self.get_cumulative_growth(growth_map)
             growth_maps[region] = growth_map
-
         return growth_maps
 
     def get_cumulative_growth(self, growth_map): 
@@ -141,14 +146,15 @@ class Estimator:
         
         compute compound growth from first year in map
         """
-        growth_map = {}
         # compound growth from prev years to get cumulative growth
+        growth_map = collections.OrderedDict(sorted(growth_map.items()))
         prev_year = -1
-        for key, value in sorted(growth_map.iteritems()):
+        for year, value in growth_map.items():  
             if prev_year < 0:
                 # this is the first year. do nothing
+                prev_year = year
                 continue
-            growth_map[key] = value * (1 + growth_map.get(key))
+            growth_map[year] = value * growth_map.get(year)
         return growth_map
     
     def most_recent_reassessments(self, df):
@@ -156,45 +162,64 @@ class Estimator:
         get the most recently re-assessed row for each property 
         (rows where rollyear = lastest rebase year)
         """
-        df = df[[self.prop_id, self.rebase_year, self.value, self.row_year]]
+        df = df[[self.prop_id, self.rebase_year, self.value, self.roll_year]]
 
-        # keep row with max rebase year for each prop_id
-        df = df[df[self.row_year] == df.groupby(
-            self.prop_id)[self.rebase_year].transform('max')]
-        return df.reset_index()
+        # for each property, keep rows w latest reassessment year and choose oldest rollyear
+        # to get last reassessed value
+        idx_max_rebase_year = df.groupby(
+            [self.prop_id])[self.rebase_year].transform(max) == df[self.rebase_year]
+        df = df[idx_max_rebase_year]
+        idx_min_roll_year = df.groupby([self.prop_id])[self.roll_year].transform(min) == df[self.roll_year]
+        df = df[idx_min_roll_year]
+        print(f"most recent assessments df is {df}")
+        return df
 
     def estimate_current_parcel_values(self):
         """
         get current value estimation for each property
         this estimation is computed using the growth_by_region_map
         """
-        growth_by_region = self.get_growth_by_region(self.df)
-
+        self.get_df()
+        growth_by_region = self.get_growth_by_region()
+        region_dfs = []
         # for each region, estimate current property values
-        for region, growth_map in growth_by_region:
+        for region, growth_map in growth_by_region.items():
             region_df = self.df.loc[self.df[self.region] == region]
 
             # keep only rows w most recently assessed property values
             region_df = self.most_recent_reassessments(region_df)
+            print(f"region df is {region_df}")
 
             # use growth_by_region to get today's estimated parcel values
             current_value_est = {}
-            for index, row in region_df.iterrows():
+            for _, row in region_df.iterrows():
                 prop_id = row[self.prop_id]
                 last_assessed_year = row[self.rebase_year]
-                growth_factor = growth_map.get()
+                print(f"last assessed year type is {type(last_assessed_year)} with val {last_assessed_year}")
+                print(f"getting 2021 is {growth_map.get(2021)}")
+                print(f"growth map is {growth_map}")
+
+                growth_factor = growth_map.get(2021)/growth_map.get(int(last_assessed_year))
+
+                current_value_est[prop_id] = growth_factor*row[self.value]
             
             region_df["current_value_estimation"] = current_value_est
+            print(f"region df is {region_df}")
+            region_dfs.append(region_df)
+        
+        output_df = pd.concat(region_dfs)
+        print(f"final output is {output_df}")
+        return output_df
 
-                
-
-    
 def main():
-    args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'row_year': "rollyear",
+    args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
             'value': "totalvalue", 'region': "zipcode5"}
     estimator = Estimator(**args)
-    estimator.get_df()
-    estimator.estimate_parcels()
+    tablename = "la_manual_est_table"
+    df = estimator.estimate_current_parcel_values()
+
+    # write table to heroku
+    import_to_heroku.import_df(df, tablename)
 
 
 if __name__ == "__main__":
