@@ -1,8 +1,10 @@
 from pkgutil import get_data
+import pandas as pd
 import psycopg2 as pg
 import psycopg2.extras
 from create_table import raw_socrata_table_schema_la, \
-    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf
+    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf, \
+        la_manual_est_table
 from sodapy import Socrata
 
 
@@ -35,7 +37,6 @@ def connect_to_heroku_db():
         print("successfully connected to database")
     except Exception as e: 
         print(e)
-    
     return conn
 
 def get_client(county_name):
@@ -131,24 +132,34 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
             conn.close()
             print("Connection closed.")
 
-def insert_df(df, tablename):
-    # df is the dataframe
-    if len(df) > 0:
-        df_columns = list(df)
-        # create (col1,col2,...)
-        columns = ",".join(df_columns)
+def create_and_insert_df(df, tablename):
+    if len(df) < 1:
+        return
 
-        # create VALUES('%s', '%s",...) one '%s' per column
-        values = "VALUES({})".format(",".join(["%s" for _ in df_columns]))
+    df_columns = list(df)
+    columns = ",".join(df_columns)
+    values = "VALUES({})".format(",".join(["%s" for _ in df_columns]))
+    insert_stmt = "INSERT INTO {} ({}) {} RETURNING {}".format(tablename, columns, values, 'ain')
 
-        #create INSERT INTO table (columns) VALUES('%s',...)
-        insert_stmt = "INSERT INTO {} ({}) {}".format(tablename, columns, values)
+    conn = connect_to_heroku_db()
+    cur = conn.cursor()
 
-        conn = connect_to_heroku_db()
-        cur = conn.cursor()
+    # create table/rewrite it if it exists
+    cur.execute("DROP TABLE IF EXISTS " + tablename)
+    cur.execute(la_manual_est_table)
+    conn.commit()
+
+    print(f"df head is {df.head(2)}")
+    try:
         psycopg2.extras.execute_batch(cur, insert_stmt, df.values)
-        conn.commit()
-        cur.close()
+    except Exception as exc:
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+            print(df)
+        print(f"max is {df['current_value_estimation'].nlargest(20)}")
+        # print(df.values)
+        print("Error executing SQL: %s"%exc)
+    conn.commit()
+    cur.close()
 
 def main():
     # tablename = "rawlacountytable"
@@ -157,9 +168,6 @@ def main():
     # import_from_api_to_heroku(county_name, all_fields_socrata_la, tablename,
     #                           primary_key, raw_socrata_table_schema_la)
 
-    ## TODO: take these parameters in as args using argparser
-    ## link schemas with tablename -> search for appropriate fields + schema
-    ## in schema dictionary
     tablename = "rawSFCountyTable"
     primary_key = "row_id"
     county_name = "sf"
