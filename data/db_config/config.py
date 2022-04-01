@@ -21,7 +21,7 @@ def config(filename='database.ini', section='postgresql'):
 
         return db
     else:
-        print("Config file not found")
+        print(f"{filename} not found")
         return None
 
 
