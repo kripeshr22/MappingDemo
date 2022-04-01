@@ -156,9 +156,7 @@ class Estimator:
         for region in regions:
             region_df = self.df.loc[self.df[self.region] == region]
             growth_map = self.get_growth_map(region_df)
-            # print(f"region is {region}, growth map is {growth_map}")
             growth_map = self.get_cumulative_growth(growth_map)
-            # print(f"cum growth map is {growth_map}")
             growth_maps[region] = growth_map
         return growth_maps
 
@@ -210,22 +208,20 @@ class Estimator:
 
             # keep only rows w most recently assessed property values
             region_df = self.most_recent_reassessments(region_df)
-            region_df.reset_index()
 
             # use growth_by_region to get today's estimated parcel values
-            current_value_est = []
-            new_col_idx = []
-            for index, row in region_df.iterrows():
+            ain_to_est = {}
+            for _, row in region_df.iterrows():
                 prev_year = int(row[self.roll_year]) 
                 growth_factor = growth_map.get(self.current_year - 1)/growth_map.get(prev_year)
-                current_value_est.append(growth_factor*row[self.value])
-                new_col_idx.append(index)
-            region_df["current_value_estimation"] = pd.Series(current_value_est, index=new_col_idx)
+                ain_to_est[row[self.prop_id]] = growth_factor*row[self.value]
+            region_df["current_value_estimation"] = region_df[self.prop_id].map(ain_to_est)
             region_dfs.append(region_df)
         
         output_df = pd.concat(region_dfs)
-        print(f"final output is {output_df}")
-        return output_df.round(2)
+        output_df["current_value_estimation"] = output_df["current_value_estimation"].round(2)
+        output_df[self.prop_id] = output_df[self.prop_id].astype(str).apply(lambda x: x.replace('.0',''))
+        return output_df
 
 def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')

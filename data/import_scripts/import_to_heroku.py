@@ -107,11 +107,7 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
         print("Inserting data")
         while(offset < num_records):
             data_generator = get_data_generator(county_name, fields, primary_key, client, offset)
-            # print(data_generator[0])
 
-            # arr = [tuple([data.get(f, "") for f in fields])
-            #        for data in data_generator[0:10]]
-            # print(arr)
             psycopg2.extras.execute_values(
                 cur,
                 insert_query,
@@ -121,7 +117,6 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
 
             conn.commit()
             offset = offset + LIMIT
-            ## TODO: print this into a log file instead of to terminal
             print("offset is ", offset)
 
     except (Exception, pg.Error) as e:
@@ -139,7 +134,7 @@ def create_and_insert_df(df, tablename):
     df_columns = list(df)
     columns = ",".join(df_columns)
     values = "VALUES({})".format(",".join(["%s" for _ in df_columns]))
-    insert_stmt = "INSERT INTO {} ({}) {} RETURNING {}".format(tablename, columns, values, 'ain')
+    insert_stmt = "INSERT INTO {} ({}) {}".format(tablename, columns, values)
 
     conn = connect_to_heroku_db()
     cur = conn.cursor()
@@ -149,15 +144,11 @@ def create_and_insert_df(df, tablename):
     cur.execute(la_manual_est_table)
     conn.commit()
 
-    print(f"df head is {df.head(2)}")
     try:
         psycopg2.extras.execute_batch(cur, insert_stmt, df.values)
     except Exception as exc:
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-            print(df)
-        print(f"max is {df['current_value_estimation'].nlargest(20)}")
-        # print(df.values)
-        print("Error executing SQL: %s"%exc)
+            print("Error executing SQL: %s"%exc)
     conn.commit()
     cur.close()
 
