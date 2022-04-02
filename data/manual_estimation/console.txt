@@ -1,0 +1,6 @@
+successfully connected to database
+selected table from database
+successfully connected to database
+df head is            ain  landbaseyear  rollyear  totalvalue  current_value_estimation
+44  4288006015          2007      2007  10625000.0               62785927.86
+45  4288006013          2007      2007   9680000.0               57201673.57
