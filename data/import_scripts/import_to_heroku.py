@@ -62,10 +62,9 @@ def get_data_generator(county_name, fields, primary_key, client, offset):
     data_generator = None
     if county_name == 'la':
         data_generator = client.get(dataset_id, select=cols_as_string,
-                                    usecodedescchar1="Commercial", istaxableparcel="Y",
+                                    usetype="C/I", istaxableparcel="Y",
                                     order=primary_key+" DESC", limit=LIMIT, offset=offset)
     if county_name == 'sf':
-        # query = f"select {cols_as_string} from "
         data_generator = client.get(dataset_id, select=cols_as_string,
             where="property_class_code in ('AC', 'B', 'BZ', 'C', 'C1', 'CD', 'CM')",
             order=primary_key+" DESC", limit=LIMIT, offset=offset)
@@ -91,7 +90,7 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
 
 
     # Retrieve Json Data from API endpoint
-    insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
+    insert_query = f"INSERT INTO {tablename} VALUES %s ON CONFLICT DO NOTHING;"
     client = get_client(county_name)
     dataset_id = get_dataset_id(county_name)
 
@@ -105,6 +104,11 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
         print("Inserting data")
         while(offset < num_records):
             data_generator = get_data_generator(county_name, fields, primary_key, client, offset)
+            
+            ## DEBUGGING ##
+            # arr = [tuple([data.get(f, "") for f in fields])
+            #        for data in data_generator[0:10]]
+            # print(arr)
 
             psycopg2.extras.execute_values(
                 cur,
@@ -153,18 +157,17 @@ def create_and_insert_df(df, tablename):
 def main():
     sys.stdout = open('import_scripts/console.txt', 'w')
     
-    # tablename = "rawlacountytable"
-    # primary_key = "rowID"
-    # county_name = "la"
-    # import_from_api_to_heroku(county_name, all_fields_socrata_la, tablename,
-    #                           primary_key, raw_socrata_table_schema_la)
+    ## LA county args ##
+    args = {"county_name": "la", "tablename": "rawlacountytable", 
+            "primary_key": "rowID", "create_table_query": raw_socrata_table_schema_la, 
+            "fields": all_fields_socrata_la, "rewrite_table": True}
 
-    tablename = "rawSFCountyTable"
-    primary_key = "row_id"
-    county_name = "sf"
-    import_from_api_to_heroku(
-        county_name, tablename, primary_key, all_fields_socrata_sf, \
-            raw_socrata_table_schema_sf, True)
+    ## SF county args ##
+    # args = {"county_name": "sf", "tablename": "rawSFCountyTable",
+    #         "primary_key": "row_id", "create_table_query": raw_socrata_table_schema_sf,
+    #         "fields": all_fields_socrata_sf, "rewrite_table": True}
+
+    import_from_api_to_heroku(**args)
 
     sys.stdout.close()
 
