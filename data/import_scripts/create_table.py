@@ -411,9 +411,10 @@ all_fields_csv_sf = [
 
 
 la_manual_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_manual_est_table ( \
-        ain VARCHAR, \
-        landbaseyear INT, \
-        rollyear INT, \
-        totalvalue MONEY, \
-        current_value_estimation MONEY \
+        prop_id VARCHAR, \
+        recorded_value MONEY, \
+        estimated_value MONEY, \
+        value_diff MONEY, \
+        lat VARCHAR, \
+        long VARCHAR \
 )"

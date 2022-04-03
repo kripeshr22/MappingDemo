@@ -6,8 +6,6 @@ from create_table import raw_socrata_table_schema_la, \
     all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf, \
         la_manual_est_table
 from sodapy import Socrata
-
-
 import os
 import sys
 
@@ -153,6 +151,8 @@ def create_and_insert_df(df, tablename):
     cur.close()
 
 def main():
+    sys.stdout = open('import_scripts/console.txt', 'w')
+    
     # tablename = "rawlacountytable"
     # primary_key = "rowID"
     # county_name = "la"
@@ -165,6 +165,8 @@ def main():
     import_from_api_to_heroku(
         county_name, tablename, primary_key, all_fields_socrata_sf, \
             raw_socrata_table_schema_sf, True)
+
+    sys.stdout.close()
 
 ## take in args here
 if __name__ == "__main__":
