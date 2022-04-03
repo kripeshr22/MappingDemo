@@ -21,8 +21,9 @@ def get_df_from_heroku(tablename, cols=None):
 def get_distinct_df(tablename, cols):
     conn = imh.connect_to_heroku_db()
     cols_as_string = ', '.join(cols)
-    df = pd.read_sql_query('select distinct on (ain) ' + cols_as_string + ' from ' + tablename, con=conn)
-    print("selected distinct parcels from database")
+    order = ' order by ain, landbaseyear desc'
+    df = pd.read_sql_query('select distinct on (ain) ' + cols_as_string + ' from ' + tablename + order, con=conn)
+    print("selected all distinct properties")
     return df
 
 def get_past4y_df(tablename, cols=None):
@@ -32,8 +33,9 @@ def get_past4y_df(tablename, cols=None):
     else:
         cols_as_string = ', '.join(cols)
         year_clause = ' where landbaseyear = \'2018\' OR landbaseyear = \'2019\' OR landbaseyear = \'2020\' OR landbaseyear = \'2021\''
-        df = pd.read_sql_query('select ' + cols_as_string + ' from ' + tablename + year_clause, con=conn)
-    print("selected rows from the past 4 years")
+        order = ' order by ain, landbaseyear desc'
+        df = pd.read_sql_query('select distinct on (ain)' + cols_as_string + ' from ' + tablename + year_clause + order, con=conn)
+    print("selected distinct properties from the past 4 years")
     return df
 
 def get_test_df(tablename, cols, rows):

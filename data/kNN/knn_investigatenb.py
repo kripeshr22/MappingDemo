@@ -26,7 +26,7 @@ rows = ['20218343001022', '20218341002019', '20218326006011', '20218340027025', 
         #'20216211005003', '20216204021019', '20216323025055', '20216208001023', '20216209015040', '20216202002028'
 
 def main():
-    select_cols = ['center_lat', 'center_lon', 'propertyusecode', 'landvalue','sqftmain']
+    select_cols = ['center_lat', 'center_lon', 'propertyusecode', 'landbaseyear', 'landvalue','sqftmain']
     tablename = 'cleanlacountytable'
     df = get_data.get_test_df(tablename, select_cols, rows)
     df = organize_data(df)
@@ -62,7 +62,7 @@ def organize_data(df):
 def find_nbdistances(df):
     print('setting X and y')
     y = pd.DataFrame(df['landvaluepersqft'])
-    X = df.drop(['landvalue', 'sqftmain', 'landvaluepersqft'], axis=1)
+    X = df.drop(['landvaluepersqft'], axis=1)
 
     print('starting machine learning now')
     

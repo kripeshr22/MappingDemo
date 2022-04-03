@@ -1,6 +1,6 @@
 from math import sqrt
 from sklearn.metrics import mean_squared_error
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
@@ -13,32 +13,35 @@ import_dir = os.path.join(current_dir, '..', 'utils')
 sys.path.append(import_dir)
 import get_data
 
-NUM_NEIGHBORS = 10
-WEIGHTS = 'uniform'        # default = 'uniform'
-ALGORITHM = 'auto'         # default - 'auto'
-METRIC = mt.custom_metric  # default = 'minkowski'
+# NUM_NEIGHBORS = 10
+# WEIGHTS = 'uniform'        # default = 'uniform'
+# ALGORITHM = 'auto'         # default - 'auto'
+# METRIC = mt.custom_metric  # default = 'minkowski'
 
 
 def main():
     # Create dataframes
-    select_cols = ['center_lat', 'center_lon', 'propertyusecode', 'landvalue','sqftmain']
+    select_cols = ['ain','center_lat', 'center_lon', 'propertyusecode', 'landbaseyear', 'landvalue','sqftmain']
     tablename = 'cleanlacountytable'
 
     train_df = get_data.get_past4y_df(tablename, select_cols)
-    pred_df = get_data.get_distinct_df(tablename, select_cols)
+    est_df = get_data.get_distinct_df(tablename, select_cols)
     train_df = organize_data(train_df)
-    pred_df = organize_data(pred_df)
-    X_pred = pred_df.drop(['landvalue', 'sqftmain', 'landvaluepersqft'], axis=1) # should we be removing sqft here? maybe not
-
+    est_df = organize_data(est_df)
+    
     # Run ML model
-    y_test, y_pred = create_ml_model(train_df)
+    y_test, y_pred, y_test2021, y_pred2021, est_df = create_ml_model(train_df, est_df)
     
     # Find error for test data
+    print("==== For all test data ====")
     print_errors(y_test, y_pred)
     make_plot(y_test, y_pred)
 
-    # Create predictions for all unique properties
-    #pred_df['predicted landvaluepersqft'] = knn.predict(X_pred)
+    print("==== For 2021 test data ====")
+    print_errors(y_test2021, y_pred2021)
+    make_plot(y_test2021, y_pred2021)
+    
+    return est_df
 
 def organize_data(df):
     for col in df:
@@ -53,7 +56,7 @@ def organize_data(df):
     df['landvaluepersqft'] = df['landvalue']/df['sqftmain']
     
     df= df[df['sqftmain'] != 0]
-    df= df[df['landvaluepersqft'] < 3000]
+    df= df[df['landvaluepersqft'] < 800]
 
     # Create a new column for each character in propertyusecode and turn any letters into numbers
     lettersToNumbers = {"A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15, "G": 16,
@@ -81,32 +84,51 @@ def organize_data(df):
     print('finished cleaning data')
     return df
 
-def create_ml_model(df):
+def create_ml_model(df, est_df):
+
+    # Split data randomly - 20% used for test data; 80% used for training data
+    df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
+    df_test2021 = df_test[df_test['landbaseyear'] == 2021]
+
     #--- Set independent and dependent variables ---#
     print('setting X and y')
-    y = pd.DataFrame(df['landvaluepersqft'])
-    X = df.drop(['landvalue', 'sqftmain', 'landvaluepersqft'], axis=1)
 
+    y_train = df_train['landvaluepersqft']
+    X_train = df_train.drop(['landvaluepersqft', 'landvalue'], axis=1)
+    y_test = df_test['landvaluepersqft']
+    X_test = df_test.drop(['landvaluepersqft', 'landvalue'], axis=1)
+    y_test2021 = df_test2021['landvaluepersqft']
+    X_test2021 = df_test2021.drop(['landvaluepersqft', 'landvalue'], axis=1)
+    X_est = est_df.drop(['landvaluepersqft', 'landvalue'], axis=1)
+
+    # Create ML Model
     print('starting machine learning now')
-    # Split data randomly - 30% used for test data; 70% used for training data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+    model = RandomForestRegressor(random_state= 42)
+    model.fit(X_train,y_train)
 
-    # Create kNN Model
-    knn= KNeighborsRegressor(n_neighbors=NUM_NEIGHBORS, weights = WEIGHTS, algorithm = ALGORITHM, metric = METRIC)
-    knn.fit(X_train,y_train)
-    y_pred = knn.predict(X_test)
-    return y_test, y_pred
+    # Predictions for all test data
+    y_pred = model.predict(X_test)
+
+    # Just 2021 test data 
+    y_pred2021 = model.predict(X_test2021)
+
+    # Make predictions for all unique properties
+    est_df['est_lvpersqft'] = model.predict(X_est)
+
+    #import ipdb; ipdb.set_trace()
+
+    return y_test, y_pred, y_test2021, y_pred2021, est_df
 
 def make_plot(y, ypred):
     # Create a plot for errors vs landvaluepersqft 
     print('creating plot now')
-    y_actual = np.array(y['landvaluepersqft'])
-    size = ypred.size
-    ypred = ypred.reshape((size,))
-    errors = y_actual - ypred
+    #y_actual = np.array(y)
+    #size = ypred.size
+    #ypred = ypred.reshape((size,))
+    errors = y - ypred
     
     plt.figure()
-    plt.scatter(y_actual, errors)
+    plt.scatter(y, errors)
     plt.title('Prediction Error of Properties of Different Values')
     plt.xlabel('Land Value Per Sqft ($/sqft)')
     plt.ylabel('Error in Land Value Prediction ($/sqft)')
@@ -115,8 +137,8 @@ def make_plot(y, ypred):
 def print_errors(y, ypred):
     print("For test properties")
     print("Mean predicted LV/sqft: ", ypred.mean())
-    print("Mean actual LV/sqft: ", y['landvaluepersqft'].mean())
+    print("Mean actual LV/sqft: ", y.mean())
     print("St. Dev of predicted LV/sqft: ", ypred.std())
-    print("St. Dev of actual LV/sqft: ", y['landvaluepersqft'].std())
+    print("St. Dev of actual LV/sqft: ", y.std())
     print("Mean error: ", sqrt(mean_squared_error(y,ypred)))
 
