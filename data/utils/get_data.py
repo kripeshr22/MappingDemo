@@ -12,10 +12,13 @@ import import_to_heroku as imh
 def get_df_from_heroku(tablename, cols=None):
     conn = imh.connect_to_heroku_db()
     if cols is None:
-        df = pd.read_sql_query('select * from ' + tablename, con=conn)
+        df = pd.read_sql_query(f'select * from {tablename}', con=conn)
     else:
         cols_as_string = ', '.join(cols)
-        df = pd.read_sql_query('select ' + cols_as_string + ' from ' + tablename, con=conn)
+        print(f"cols as string: {cols_as_string}")
+        print(f"tablename: {tablename}")
+
+        df = pd.read_sql_query(f'select {cols_as_string} from {tablename}', con=conn)
     print("selected table from database")
     return df
 

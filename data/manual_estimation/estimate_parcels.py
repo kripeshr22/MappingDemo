@@ -18,14 +18,16 @@ import get_data
 
 
 class Estimator:
-    def __init__(self, county, prop_id, rebase_year, roll_year, region, value):
+    def __init__(self, county, prop_id, rebase_year, roll_year, region, lat, long, value):
         self.county = county
         self.prop_id = prop_id
         self.rebase_year = rebase_year
         self.roll_year = roll_year
         self.region = region
         self.value = value
-        self.columns = [prop_id, rebase_year, roll_year, region, value]
+        self.lat = lat
+        self.long = long
+        self.columns = [prop_id, rebase_year, roll_year, region, value, lat, long]
         self.current_year = datetime.datetime.now().year
 
     def get_df(self):
@@ -183,7 +185,8 @@ class Estimator:
         get the most recently re-assessed row for each property 
         (rows where rollyear = lastest rebase year)
         """
-        df = df[[self.prop_id, self.rebase_year, self.roll_year, self.value]]
+        output_cols = [self.prop_id, self.rebase_year, self.roll_year, self.value, self.long, self.lat]
+        df = df[output_cols]
 
         # for each property, keep rows w latest reassessment year and choose oldest rollyear
         # to get last reassessed value
@@ -192,6 +195,41 @@ class Estimator:
         df = df[idx_max_rebase_year]
         idx_min_roll_year = df.groupby([self.prop_id])[self.roll_year].transform(min) == df[self.roll_year]
         df = df[idx_min_roll_year]
+
+        return df
+
+    def get_recorded_value(self, df):
+        """
+        get current value of property as per county records
+        columns = prop_id, value
+        """
+        output_df_cols = [self.prop_id, self.value, self.roll_year]
+        df = df[output_df_cols]
+
+        idx_max_year = df.groupby(
+            [self.prop_id])[self.roll_year].transform(max) == df[self.roll_year]
+        df = df[idx_max_year]
+        print(df)
+        return df.drop(columns=[self.roll_year])
+
+
+    def format_output_df(self, df):
+        """
+        format output df to have the columns: 
+        prop_id, recorded_value, estimated_value, 
+        value_diff (diff between recorded & estimated values), lat, long 
+        """
+        # standardize column names
+        df.rename(columns={self.prop_id: 'prop_id', self.lat: 'lat', self.long: 'long',
+          self.value: 'recorded_value'}, inplace=True)
+
+        # common formatting irregularities
+        df["estimated_value"] = df["estimated_value"].round(2)
+        df['prop_id'] = df['prop_id'].astype(
+            str).apply(lambda x: x.replace('.0', ''))
+
+        # add missing cols
+        df['value_diff'] = df['recorded_value'] - df['estimated_value']
         return df
 
     def estimate_current_parcel_values(self):
@@ -215,19 +253,25 @@ class Estimator:
                 prev_year = int(row[self.roll_year]) 
                 growth_factor = growth_map.get(self.current_year - 1)/growth_map.get(prev_year)
                 ain_to_est[row[self.prop_id]] = growth_factor*row[self.value]
-            region_df["current_value_estimation"] = region_df[self.prop_id].map(ain_to_est)
+
+            region_df["estimated_value"] = region_df[self.prop_id].map(ain_to_est)
             region_dfs.append(region_df)
         
-        output_df = pd.concat(region_dfs)
-        output_df["current_value_estimation"] = output_df["current_value_estimation"].round(2)
-        output_df[self.prop_id] = output_df[self.prop_id].astype(str).apply(lambda x: x.replace('.0',''))
+        est_df = pd.concat(region_dfs)
+        est_df = est_df.drop(columns=[self.value, self.roll_year, self.rebase_year])
+
+        recorded_val_df = self.get_recorded_value(self.df)
+        output_df = pd.merge(est_df, recorded_val_df, how='inner', on=self.prop_id)
+        output_df = self.format_output_df(output_df)
+        print(output_df)
+
         return output_df
 
 def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')
 
     args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
-            'value': "totalvalue", 'region': "zipcode5"}
+            'value': "totalvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon'}
     estimator = Estimator(**args)
     tablename = "la_manual_est_table"
     df = estimator.estimate_current_parcel_values()
