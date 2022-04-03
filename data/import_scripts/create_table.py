@@ -408,3 +408,13 @@ all_fields_csv_sf = [
         'Analysis Neighborhood',
         'Row ID',
 ]
+
+
+la_manual_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_manual_est_table ( \
+        prop_id VARCHAR, \
+        recorded_value MONEY, \
+        estimated_value MONEY, \
+        value_diff MONEY, \
+        lat VARCHAR, \
+        long VARCHAR \
+)"

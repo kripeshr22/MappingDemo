@@ -1,11 +1,11 @@
 from pkgutil import get_data
+import pandas as pd
 import psycopg2 as pg
 import psycopg2.extras
 from create_table import raw_socrata_table_schema_la, \
-    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf
+    all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf, \
+        la_manual_est_table
 from sodapy import Socrata
-
-
 import os
 import sys
 
@@ -35,7 +35,6 @@ def connect_to_heroku_db():
         print("successfully connected to database")
     except Exception as e: 
         print(e)
-    
     return conn
 
 def get_client(county_name):
@@ -120,7 +119,6 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
 
             conn.commit()
             offset = offset + LIMIT
-            ## TODO: print this into a log file instead of to terminal
             print("offset is ", offset)
 
     except (Exception, pg.Error) as e:
@@ -131,8 +129,34 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
             conn.close()
             print("Connection closed.")
 
+def create_and_insert_df(df, tablename):
+    if len(df) < 1:
+        return
+
+    df_columns = list(df)
+    columns = ",".join(df_columns)
+    values = "VALUES({})".format(",".join(["%s" for _ in df_columns]))
+    insert_stmt = "INSERT INTO {} ({}) {}".format(tablename, columns, values)
+
+    conn = connect_to_heroku_db()
+    cur = conn.cursor()
+
+    # create table/rewrite it if it exists
+    cur.execute("DROP TABLE IF EXISTS " + tablename)
+    cur.execute(la_manual_est_table)
+    conn.commit()
+
+    try:
+        psycopg2.extras.execute_batch(cur, insert_stmt, df.values)
+    except Exception as exc:
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+            print("Error executing SQL: %s"%exc)
+    conn.commit()
+    cur.close()
 
 def main():
+    sys.stdout = open('import_scripts/console.txt', 'w')
+    
     ## LA county args ##
     args = {"county_name": "la", "tablename": "rawlacountytable", 
             "primary_key": "rowID", "create_table_query": raw_socrata_table_schema_la, 
@@ -145,7 +169,7 @@ def main():
 
     import_from_api_to_heroku(**args)
 
-
+    sys.stdout.close()
 
 ## take in args here
 if __name__ == "__main__":
