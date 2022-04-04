@@ -18,7 +18,7 @@ async function testGet (request, response) {
 
     try{
         console.log('Succesfully connected')
-        const rowList = await client.query('SELECT * FROM rawlacountytable LIMIT 1000');
+        const rowList = await client.query('SELECT * FROM la_manual_est_table LIMIT 1000');
         const results = { 'results': (rowList) ? rowList.rows : null};
         // console.log(results);
         response.status(200).send(results);

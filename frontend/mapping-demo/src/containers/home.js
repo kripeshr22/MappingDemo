@@ -4,28 +4,23 @@ import "../styles/home.css"
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import mapboxgl from "!mapbox-gl";
-import CaseStudyDesign1 from "../components/CaseStudyDesign1";
-import ReactDOM from "react-dom";
-import caseStudies from "../components/caseStudiesData";
 
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const heroku = process.env.REACT_APP_API_URL;
 mapboxgl.accessToken = token;
 
 
-
-
-
 const Home = () => {
     const mapContainer = useRef(null);
     const [markers, setMarkers] = useState([]);
+
     const fetchMarkers = async () => {
         try {
             const response = await fetch(heroku+"server/testGet/", {
-                    headers : {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                headers : {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
             const data = await response.json();
             return data["results"];
@@ -38,58 +33,148 @@ const Home = () => {
         const map = new mapboxgl.Map({
             container: mapContainer.current,
             // See style options here: https://docs.mapbox.com/api/maps/#styles
-            style: 'mapbox://styles/mapbox/streets-v11',
+            style: 'mapbox://styles/mapbox/streets-v11?optimize=true',
             center: [-118.2437, 34.0522],
             zoom: 12.5,
         });
-        map.on('load', function () {
+        map.on('load', () => {
             map.resize()
+            // map.addLayer({
+            //     id: 'clusters',
+            //     type: 'circle',
+            //     source: ,//insert heroku markers,
+            //     paint: {
+            //         // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+            //         // with three steps to implement three types of circles:
+            //         //   * Blue, 20px circles when point count is less than 100
+            //         //   * Yellow, 30px circles when point count is between 100 and 750
+            //         //   * Pink, 40px circles when point count is greater than or equal to 750
+            //         'circle-color': [
+            //             'step',
+            //             ['get', 'point_count'],
+            //             '#51bbd6',
+            //             100,
+            //             '#f1f075',
+            //             750,
+            //             '#f28cb1'
+            //         ],
+            //         'circle-radius': [
+            //             'step',
+            //             ['get', 'point_count'],
+            //             20,
+            //             100,
+            //             30,
+            //             750,
+            //             40
+            //         ]
+            //     }
+            // });
+            // Add a new source from our GeoJSON data and
+            // set the 'cluster' option to true. GL-JS will
+            // add the point_count property to your source data.
+            // map.addSource('earthquakes', {
+            //     type: 'geojson',
+            //     // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+            //     // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+            //     // data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
+            //     data: 'https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json',
+            //     cluster: true,
+            //     clusterMaxZoom: 14, // Max zoom to cluster points on
+            //     clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+            // });
+            //
+            // map.addLayer({
+            //     id: 'clusters',
+            //     type: 'circle',
+            //     source: 'earthquakes',
+            //     filter: ['has', 'point_count'],
+            //     paint: {
+            // // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+            // // with three steps to implement three types of circles:
+            // //   * Blue, 20px circles when point count is less than 100
+            // //   * Yellow, 30px circles when point count is between 100 and 750
+            // //   * Pink, 40px circles when point count is greater than or equal to 750
+            //         'circle-color': [
+            //             'step',
+            //             ['get', 'point_x'],
+            //             '#51bbd6',
+            //             100,
+            //             '#f1f075',
+            //             750,
+            //             '#f28cb1'
+            //         ],
+            //         'circle-radius': [
+            //             'step',
+            //             ['get', 'point_x'],
+            //             20,
+            //             100,
+            //             30,
+            //             750,
+            //             40
+            //         ]
+            //     }
+            // });
+            //
+            // map.addLayer({
+            //     id: 'cluster-count',
+            //     type: 'symbol',
+            //     source: 'earthquakes',
+            //     filter: ['has', 'point_x'],
+            //     layout: {
+            //         'text-field': '{point_count_abbreviated}',
+            //         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            //         'text-size': 12
+            //     }
+            // });
+            //
+            // map.addLayer({
+            //     id: 'unclustered-point',
+            //     type: 'circle',
+            //     source: 'earthquakes',
+            //     filter: ['!', ['has', 'point_x']],
+            //     paint: {
+            //         'circle-color': '#11b4da',
+            //         'circle-radius': 4,
+            //         'circle-stroke-width': 1,
+            //         'circle-stroke-color': '#fff'
+            //     }
+            // });
         });
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
         // const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
         //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
         // `
         // );
-        /* await markers.forEach(marker => {
-            // remove css styling for this one to look good
-            const currentMarker = new mapboxgl.Marker()
+        await markers.slice(-20).forEach(marker => {
+            const el = document.createElement('div');
+            console.log("log");
+            el.className = 'marker';
+            if (marker.nettaxablevalue <= 50000) {
+                el.className += ' red'
+            } else {
+                el.className += ' green'
+            }
+
+
+            // map.addControl(new mapboxgl.Marker(el)
+            //     .setLngLat([marker.center_lon, marker.center_lat])
+            //     .addTo(map)
+            //     .setPopup(new mapboxgl.Popup({offset: 25})
+            //         .setHTML(`<h3>${marker.propertylocation}</h3>
+            //                     <p>Net Taxable Value: ${marker.nettaxablevalue}</p>`))
+            // )
+
+            // TODO - once able to query from new table, replace old code with commented out code
+            new mapboxgl.Marker(el)
+                // .setLngLat([marker.long, marker.lat])
                 .setLngLat([marker.center_lon, marker.center_lat])
                 .addTo(map)
                 .setPopup(new mapboxgl.Popup({offset: 25})
-                    .setHTML(`<a>${marker.nettaxablevalue}</a>`));
-
-
-            // map.addControl(mark)
-        }); */
-
-        await caseStudies.forEach(cs => {
-            const placeholder = document.createElement('div');
-            ReactDOM.render(<CaseStudyDesign1 properties={cs} />, placeholder);
-
-            const currentMarker = new mapboxgl.Marker()
-                .setLngLat([cs.center_lon, cs.center_lat])
-                .addTo(map)
-                .setPopup(new mapboxgl.Popup({offset: 25})
-                    .setDOMContent(placeholder));
-            // .setHTML(`<a>${marker.nettaxablevalue}</a>`));
-
-
-            // map.addControl(mark)
-            currentMarker.getElement().addEventListener('click', () => {
-                console.log("Clicked")})
-        })
-
-
-
-        // const marker = new MapboxGl.Popup()
-        //     .setDOMContent(placeholder)
-        //     .setLngLat({lng: lng, lat: lat})
-        //     .addTo(map);
-
-        // map.addControl(new mapboxgl.Marker()
-        //     .setLngLat([-118.3581, 34.0722])
-        //     .addTo(map)
-        //     .setPopup(popup));
+                    // .setHTML(`<h3>Assessed value: ${marker.recorded_value}</h3>
+                    //             <h3>Estimated value: ${marker.estimated_value}</h3>`));
+                    .setHTML(`<h3>Landvalue: ${marker.landvalue}</h3> 
+                                <h3>Net taxable value: ${marker.nettaxablevalue}</h3>`));
+        });
 
         // clean up on unmount
         return () => map.remove();
@@ -110,11 +195,13 @@ const Home = () => {
     return (
         <div className="home">
             <h1 className="header"> [Project Under Construction] </h1>
-            {/*{(popup !== null) ? <CaseStudyDesign1 properties={initialProperties[0]} /> : null}*/}
             <div className="map">
                 <div className="map-container" ref={mapContainer}/>
             </div>
         </div>)
+    // return (
+    //     <div>THANK YOU FOR VISITING!</div>
+    // )
 }
 
 export default Home;
