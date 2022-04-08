@@ -2,9 +2,14 @@ import React, { useState, useRef } from "react";
 import useSwr from "swr";
 import ReactMapGL, { Marker, FlyToInterpolator } from "react-map-gl";
 import useSupercluster from "use-supercluster";
+import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker'; // Load worker code separately with worker-loader
+
 import "../styles/main.css"
 import "../styles/home.css"
 
+mapboxgl.workerClass = MapboxWorker; // Wire up loaded worker to be used instead of the default
 const fetcher = (...args) => fetch(...args).then(response => response.json());
 const heroku = process.env.REACT_APP_API_URL;
 export default function App() {
