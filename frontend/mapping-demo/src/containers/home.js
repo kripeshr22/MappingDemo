@@ -24,12 +24,12 @@ export default function App() {
     console.log('crimes', crimes)
     const points = crimes.map(crime => ({
         type: "Feature",
-        properties: { cluster: false, crimeId: crime.ain, category: crime.zipcode },
+        properties: { cluster: false, crimeId: crime.prop_id, category: crime.zipcode },
         geometry: {
             type: "Point",
             coordinates: [
-                parseFloat(crime.center_lon),
-                parseFloat(crime.center_lat)
+                parseFloat(crime.long),
+                parseFloat(crime.lat)
             ]
         }
     }));
