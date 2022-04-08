@@ -418,3 +418,11 @@ la_manual_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_manual_est_table (
         lat VARCHAR, \
         long VARCHAR \
 )"
+
+la_rf_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_rf_est_table ( \
+        prop_id VARCHAR, \
+        lat VARCHAR, \
+        long VARCHAR, \
+        estimated_value MONEY, \
+        sqft INT \
+)"
