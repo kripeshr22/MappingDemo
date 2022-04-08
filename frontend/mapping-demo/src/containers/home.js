@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import useSwr from "swr";
-import ReactMapGL, { Marker, Popup, FlyToInterpolator } from "react-map-gl";
+import ReactMapGL, { Marker, FlyToInterpolator } from "react-map-gl";
 import useSupercluster from "use-supercluster";
 import "../styles/main.css"
 import "../styles/home.css"
