@@ -141,39 +141,25 @@ const Home = () => {
             // });
         });
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-        // const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-        //     ` <a href="https://thegrovela.com/" target="_blank">The Grove</a>
-        // `
-        // );
-        await markers.slice(-20).forEach(marker => {
+
+        await markers.splice(-50).forEach(marker => {
+            let subsidy = (marker.estimated_value.replace("$", "").replaceAll(",", "")) -
+                (marker.recorded_value.replace("$", "").replaceAll(",", ""));
             const el = document.createElement('div');
-            console.log("log");
             el.className = 'marker';
-            if (marker.nettaxablevalue <= 50000) {
+            if (subsidy >= 50000) {
                 el.className += ' red'
             } else {
                 el.className += ' green'
             }
 
-
-            // map.addControl(new mapboxgl.Marker(el)
-            //     .setLngLat([marker.center_lon, marker.center_lat])
-            //     .addTo(map)
-            //     .setPopup(new mapboxgl.Popup({offset: 25})
-            //         .setHTML(`<h3>${marker.propertylocation}</h3>
-            //                     <p>Net Taxable Value: ${marker.nettaxablevalue}</p>`))
-            // )
-
-            // TODO - once able to query from new table, replace old code with commented out code
             new mapboxgl.Marker(el)
-                // .setLngLat([marker.long, marker.lat])
-                .setLngLat([marker.center_lon, marker.center_lat])
+                .setLngLat([marker.long, marker.lat])
                 .addTo(map)
                 .setPopup(new mapboxgl.Popup({offset: 25})
-                    // .setHTML(`<h3>Assessed value: ${marker.recorded_value}</h3>
-                    //             <h3>Estimated value: ${marker.estimated_value}</h3>`));
-                    .setHTML(`<h3>Landvalue: ${marker.landvalue}</h3> 
-                                <h3>Net taxable value: ${marker.nettaxablevalue}</h3>`));
+                    .setHTML(`<h4>Assessed value: ${marker.recorded_value}</h4>
+                                <h4>Estimated value: ${marker.estimated_value}</h4>
+                                <h3>Estimated subsidy: ${"$" + new Intl.NumberFormat().format(subsidy)}</h3>`));
         });
 
         // clean up on unmount
