@@ -416,7 +416,8 @@ la_manual_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_manual_est_table (
         estimated_value MONEY, \
         value_diff MONEY, \
         lat VARCHAR, \
-        long VARCHAR \
+        long VARCHAR, \
+        zipcode5 VARCHAR(5)\
 )"
 
 la_rf_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_rf_est_table ( \

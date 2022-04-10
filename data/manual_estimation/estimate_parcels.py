@@ -9,11 +9,13 @@ current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'import_scripts')
 sys.path.append(import_dir)
 import import_to_heroku
+import create_table 
 
 current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'utils')
 sys.path.append(import_dir)
 import get_data
+
 
 
 
@@ -185,7 +187,8 @@ class Estimator:
         get the most recently re-assessed row for each property 
         (rows where rollyear = lastest rebase year)
         """
-        output_cols = [self.prop_id, self.rebase_year, self.roll_year, self.value, self.long, self.lat]
+        output_cols = [self.prop_id, self.rebase_year, self.roll_year, self.value, 
+            self.long, self.lat, self.region]
         df = df[output_cols]
 
         # for each property, keep rows w latest reassessment year and choose oldest rollyear
@@ -277,7 +280,7 @@ def main():
     df = estimator.estimate_current_parcel_values()
 
     # write table to heroku
-    import_to_heroku.create_and_insert_df(df, tablename)
+    import_to_heroku.create_and_insert_df(df, tablename, create_table.la_manual_est_table)
 
     sys.stdout.close()
 
