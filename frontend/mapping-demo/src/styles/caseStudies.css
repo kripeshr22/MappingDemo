@@ -65,3 +65,7 @@ a {
     font-size: medium;
     font-weight: normal;
 }
+
+.mapboxgl-popup-content {
+    width: 700px;
+}
