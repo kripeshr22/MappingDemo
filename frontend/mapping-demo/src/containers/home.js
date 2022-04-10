@@ -6,7 +6,7 @@ import "../styles/home.css"
 import mapboxgl from "!mapbox-gl";
 import CaseStudyDesign1 from "../components/CaseStudyDesign1";
 import ReactDOM from "react-dom";
-import caseStudies from "../components/caseStudiesData";
+import caseStudies from "../components/caseStudiesData.json";
 
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const heroku = process.env.REACT_APP_API_URL;

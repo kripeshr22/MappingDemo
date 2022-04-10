@@ -6,7 +6,7 @@ import "../styles/home.css"
 import mapboxgl from "!mapbox-gl";
 import CaseStudyDesign1 from "../components/CaseStudyDesign1";
 import ReactDOM from "react-dom";
-import caseStudies from "../components/caseStudiesData";
+import caseStudies from "../components/caseStudiesData.json";
 
 const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 mapboxgl.accessToken = token;
@@ -28,7 +28,7 @@ const CaseStudies = () => {
         });
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        await caseStudies.forEach(cs => {
+        await caseStudies.caseStudies.forEach(cs => {
             const placeholder = document.createElement('div');
             ReactDOM.render(<CaseStudyDesign1 properties={cs} />, placeholder);
 
