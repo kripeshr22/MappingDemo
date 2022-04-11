@@ -21,14 +21,14 @@ def main():
     pred_df = organize_data(pred_df)
 
     print('===== For 2018-2021 Data =====')
-    #find_cutoff(train_df)   
+    find_cutoff(train_df)   
     #plot_lvpersqft(train_df)
-    corr_matrix(train_df)
+    # corr_matrix(train_df)
 
     print('===== For all unique data =====')
-    #find_cutoff(pred_df)  
+    find_cutoff(pred_df)  
     #plot_lvpersqft(pred_df)
-    corr_matrix(pred_df)
+    # corr_matrix(pred_df)
 
 
 def organize_data(df):
@@ -44,7 +44,7 @@ def organize_data(df):
     df['landvaluepersqft'] = df['landvalue']/df['sqftmain']
     
     df= df[df['sqftmain'] != 0]
-    df= df[df['landvaluepersqft'] < 800]
+    # df= df[df['landvaluepersqft'] < 800]
 
     # Create a new column for each character in propertyusecode and turn any letters into numbers
     lettersToNumbers = {"A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15, "G": 16,

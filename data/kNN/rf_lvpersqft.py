@@ -17,14 +17,16 @@ current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'utils')
 sys.path.append(import_dir)
 import get_data
+import encode_zipcode
 
 def main():
     # Create dataframes
     # select_cols = ['ain','center_lat', 'center_lon', 'propertyusecode', 'sqftmain', 'landbaseyear', 'landvalue']
-    select_cols = ['ain','center_lat', 'center_lon', 'sqftmain', 'landbaseyear', 'landvalue']
+    select_cols = ['ain','center_lat', 'center_lon', 'sqftmain', 'landbaseyear', 'landvalue', 'zipcode5']
 
-    train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)
-    est_df = get_data.get_distinct_df('laclean_pre2018_table', select_cols)
+    train_df, est_df = encode_zipcode.main(select_cols = select_cols)
+    # train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)
+    # est_df = get_data.get_distinct_df('laclean_pre2018_table', select_cols)
     train_df = organize_data(train_df)
     est_df = organize_data(est_df)
     
@@ -33,7 +35,6 @@ def main():
     prevvalue_df = est_df[['prevvalueyear', 'prevvalue']].copy()
     train_df.drop(['landvalue'], axis=1, inplace=True)
     train_df = train_df.merge(prevvalue_df, how='inner', left_index=True, right_index=True)
-    #import ipdb; ipdb.set_trace()
 
     # Run ML model
     y_test, y_pred, y_test2021, y_pred2021, est_df = create_ml_model(train_df, est_df)
@@ -48,8 +49,9 @@ def main():
     make_plot(y_test2021, y_pred2021)
 
     # Create output df and upload to Heroku
-    # outputdf = format_output_df(est_df)
-    # import_to_heroku.create_and_insert_df(outputdf, 'la_rf_est_table')
+    outputdf = format_output_df(est_df)
+    import_to_heroku.create_and_insert_df(outputdf, 'la_rf_est_table')
+    print('imported data into Heroku database in table la_rf_est_table')
     
 
 def organize_data(df):
@@ -84,7 +86,7 @@ def organize_data(df):
     df['landvaluepersqft'] = df['landvalue']/df['sqftmain']
     
     df= df[df['sqftmain'] != 0]
-    df= df[df['landvaluepersqft'] < 800]
+    df= df[df['landvaluepersqft'] < 5000]
    
     print('finished cleaning data')
     return df
@@ -105,7 +107,7 @@ def create_ml_model(df, est_df):
     y_test2021 = df_test2021['landvaluepersqft']
     X_test2021 = df_test2021.drop(['landvaluepersqft', 'landbaseyear'], axis=1)
     X_est = est_df.drop(['landvaluepersqft'], axis=1)
-    
+    #import ipdb; ipdb.set_trace()
     # Create ML Model
     print('starting machine learning now')
     model = RandomForestRegressor(random_state= 42)
@@ -145,9 +147,9 @@ def print_errors(y, ypred):
 
 def format_output_df(df):
     df.reset_index(inplace=True)
-    outputdf = df[['ain', 'center_lat', 'center_lon', 'est_lv', 'sqftmain']].copy()
+    outputdf = df[['ain', 'center_lat', 'center_lon', 'est_lv']].copy()
     # standardize column names
-    outputdf.rename(columns={'ain': 'prop_id','center_lat': 'lat', 'center_lon': 'long','est_lv': 'estimated_value', 'sqftmain': 'sqft'}, inplace=True)
+    outputdf.rename(columns={'ain': 'prop_id','center_lat': 'lat', 'center_lon': 'long','est_lv': 'estimated_value'}, inplace=True)
     # common formatting irregularities
     outputdf["estimated_value"] = outputdf["estimated_value"].round(2)
     outputdf['prop_id'] = outputdf['prop_id'].astype(str).apply(lambda x: x.replace('.0', ''))

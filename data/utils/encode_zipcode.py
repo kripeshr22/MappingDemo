@@ -8,21 +8,21 @@ rows = ['20218343001022', '20218341002019', '20218326006011', '20218340027025', 
         #'20216211005003', '20216204021019', '20216323025055', '20216208001023', '20216209015040', '20216202002028'
 
 
-def main(encode="one_hot", select_cols = None):
+def main(encode="hash", select_cols = None):
     tablename = 'cleanlacountytable'
     encode_col = 'zipcode5'
     
-    train_df = get_data.get_past4_df(tablename, select_cols)       # all properties assessed in 2018-2021
-    pred_df = get_data.get_distinct_df(tablename, select_cols)     # all distinct properties to make predictions for
-
+    train_df = get_data.get_past4y_df(tablename, select_cols)       # all properties assessed in 2018-2021
+    est_df = get_data.get_distinct_df(tablename, select_cols)     # all distinct properties to make predictions for
+    
     if encode == "hash":
         train_df = encode_hash(train_df, 5, encode_col)
-        pred_df = encode_hash(pred_df, 5, encode_col)
-        return train_df, pred_df
+        est_df = encode_hash(est_df, 5, encode_col)
+        return train_df, est_df
     if encode == "one_hot":
         train_df = encode_one_hot(train_df, encode_col)
-        pred_df = encode_one_hot(pred_df, encode_col)
-        return train_df, pred_df
+        est_df = encode_one_hot(est_df, encode_col)
+        return train_df, est_df
     else:
         print("encode was not /'hash/' or /'one_hot/'")
 
