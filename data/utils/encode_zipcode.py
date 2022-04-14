@@ -9,11 +9,10 @@ rows = ['20218343001022', '20218341002019', '20218326006011', '20218340027025', 
 
 
 def main(encode="hash", select_cols = None):
-    tablename = 'cleanlacountytable'
     encode_col = 'zipcode5'
     
-    train_df = get_data.get_past4y_df(tablename, select_cols)       # all properties assessed in 2018-2021
-    est_df = get_data.get_distinct_df(tablename, select_cols)     # all distinct properties to make predictions for
+    train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)       # all properties assessed in 2018-2021
+    est_df = get_data.get_distinct_df('laclean_pre2018_table', select_cols)     # all distinct properties to make predictions for
     
     if encode == "hash":
         train_df = encode_hash(train_df, 5, encode_col)

@@ -24,9 +24,9 @@ def main():
     # select_cols = ['ain','center_lat', 'center_lon', 'propertyusecode', 'sqftmain', 'landbaseyear', 'landvalue']
     select_cols = ['ain','center_lat', 'center_lon', 'sqftmain', 'landbaseyear', 'landvalue', 'zipcode5']
 
-    train_df, est_df = encode_zipcode.main(select_cols = select_cols)
-    # train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)
-    # est_df = get_data.get_distinct_df('laclean_pre2018_table', select_cols)
+    # train_df, est_df = encode_zipcode.main(select_cols = select_cols)
+    train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)
+    est_df = get_data.get_distinct_df('laclean_pre2018_table', select_cols)
     train_df = organize_data(train_df)
     est_df = organize_data(est_df)
     
@@ -86,7 +86,7 @@ def organize_data(df):
     df['landvaluepersqft'] = df['landvalue']/df['sqftmain']
     
     df= df[df['sqftmain'] != 0]
-    df= df[df['landvaluepersqft'] < 5000]
+    df= df[df['landvaluepersqft'] < 800]
    
     print('finished cleaning data')
     return df

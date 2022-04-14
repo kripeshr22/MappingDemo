@@ -426,11 +426,27 @@ la_rf_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_rf_est_table ( \
         estimated_value MONEY \
 )"
 
-la_final_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_table ( \
+la_final_est_byzipcode = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byzipcode ( \
         prop_id VARCHAR, \
         lat VARCHAR, \
         long VARCHAR, \
         zipcode VARCHAR, \
+        sqft INT, \
+        address VARCHAR, \
+        recorded_value MONEY, \
+        estimated_value MONEY, \
+        assessedin2021 BOOL, \
+        is_manualest BOOL \
+)"
+
+la_final_est_byquantile = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byquantile ( \
+        prop_id VARCHAR, \
+        lat VARCHAR, \
+        long VARCHAR, \
+        zipcode VARCHAR, \
+        sqft INT, \
+        address VARCHAR, \
+        recorded_value MONEY, \
         estimated_value MONEY, \
         assessedin2021 BOOL, \
         is_manualest BOOL \
