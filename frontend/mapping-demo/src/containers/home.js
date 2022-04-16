@@ -145,9 +145,10 @@ const Home = () => {
         await markers.splice(-50).forEach(marker => {
             let subsidy = (marker.estimated_value.replace("$", "").replaceAll(",", "")) -
                 (marker.recorded_value.replace("$", "").replaceAll(",", ""));
+            subsidy = subsidy / marker.sqft;
             const el = document.createElement('div');
             el.className = 'marker';
-            if (subsidy >= 50000) {
+            if (subsidy >= 50) {
                 el.className += ' red'
             } else {
                 el.className += ' green'
@@ -157,9 +158,10 @@ const Home = () => {
                 .setLngLat([marker.long, marker.lat])
                 .addTo(map)
                 .setPopup(new mapboxgl.Popup({offset: 25})
-                    .setHTML(`<h4>Assessed value: ${marker.recorded_value}</h4>
+                    .setHTML(`<h4>Address: ${marker.address} <br/>${marker.sqft} sfqt </h4>
+                                <h4>Assessed value: ${marker.recorded_value}</h4>
                                 <h4>Estimated value: ${marker.estimated_value}</h4>
-                                <h3>Estimated subsidy: ${"$" + new Intl.NumberFormat().format(subsidy)}</h3>`));
+                                <h3>Estimated subsidy per sqft: ${"$" + new Intl.NumberFormat().format(subsidy)}</h3>`));
         });
 
         // clean up on unmount
