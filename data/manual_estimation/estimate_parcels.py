@@ -39,7 +39,7 @@ class Estimator:
 
     def get_df(self):
         """get df + format columns from input df: currently for la county only"""
-        df = get_data.get_raw_df(self.county, self.columns)
+        df = get_data.get_clean_df(self.county, self.columns)
         # df = df.apply(pd.to_numeric)
         df[self.rebase_year] = df[self.rebase_year].astype(int)
         df[self.roll_year] = df[self.roll_year].astype(int)
@@ -124,6 +124,7 @@ class Estimator:
                 continue
 
             # iterate through re-assessed years
+            # print(prop_df)
             for index, row in prop_df.iterrows():
                 curr_year = row[self.rebase_year]
                 curr_value = row[self.value]
@@ -286,7 +287,7 @@ def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')
 
     args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
-            'value': "roll_landvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
+            'value': "landvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
             'sqft': 'sqftmain', 'address': 'propertylocation'}
     estimator = Estimator(**args)
     output_tablename = "la_manual_est_table"
