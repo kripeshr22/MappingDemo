@@ -39,7 +39,7 @@ class Estimator:
 
     def get_df(self):
         """get df + format columns from input df: currently for la county only"""
-        df = get_data.get_clean_df(self.county, self.columns)
+        df = get_data.get_raw_df(self.county, self.columns)
         # df = df.apply(pd.to_numeric)
         df[self.rebase_year] = df[self.rebase_year].astype(int)
         df[self.roll_year] = df[self.roll_year].astype(int)
@@ -286,10 +286,10 @@ def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')
 
     args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
-            'value': "totalvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
+            'value': "roll_landvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
             'sqft': 'sqftmain', 'address': 'propertylocation'}
     estimator = Estimator(**args)
-    tablename = "la_manual_est_table"
+    output_tablename = "la_manual_est_table"
     df = estimator.estimate_current_parcel_values()
     print(df)
     df_columns = list(df)
@@ -297,7 +297,8 @@ def main():
     print(columns)
 
     # write table to heroku
-    import_to_heroku.create_and_insert_df(df, tablename, create_table.la_manual_est_table)
+    import_to_heroku.create_and_insert_df(
+        df, output_tablename, create_table.la_manual_est_table)
 
     sys.stdout.close()
 
