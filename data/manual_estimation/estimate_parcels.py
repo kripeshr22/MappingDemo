@@ -124,6 +124,7 @@ class Estimator:
                 continue
 
             # iterate through re-assessed years
+            # print(prop_df)
             for index, row in prop_df.iterrows():
                 curr_year = row[self.rebase_year]
                 curr_value = row[self.value]
@@ -286,10 +287,10 @@ def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')
 
     args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
-            'value': "totalvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
+            'value': "landvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
             'sqft': 'sqftmain', 'address': 'propertylocation'}
     estimator = Estimator(**args)
-    tablename = "la_manual_est_table"
+    output_tablename = "la_manual_est_table"
     df = estimator.estimate_current_parcel_values()
     print(df)
     df_columns = list(df)
@@ -297,7 +298,8 @@ def main():
     print(columns)
 
     # write table to heroku
-    import_to_heroku.create_and_insert_df(df, tablename, create_table.la_manual_est_table)
+    import_to_heroku.create_and_insert_df(
+        df, output_tablename, create_table.la_manual_est_table)
 
     sys.stdout.close()
 
