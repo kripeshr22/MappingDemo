@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import useSwr from "swr";
-import ReactMapGL, { Marker, FlyToInterpolator } from "react-map-gl";
+import ReactMapGL, { Marker, NavigationControl, Popup, FullscreenControl,
+    ScaleControl,
+    GeolocateControl, FlyToInterpolator } from "react-map-gl";
 import useSupercluster from "use-supercluster";
 
 import "../styles/main.css"
@@ -9,6 +11,8 @@ import "../styles/home.css"
 const fetcher = (...args) => fetch(...args).then(response => response.json());
 const heroku = process.env.REACT_APP_API_URL;
 export default function App() {
+    const [showPopup, setShowPopup] = useState(false);
+    const[popupInfo, setPopupInfo] = useState('');
     const [viewport, setViewport] = useState({
         latitude: 34.0522,
         longitude: -118.2437,
@@ -21,20 +25,22 @@ export default function App() {
     const url =
         heroku+"server/testGet";
     const { data, error } = useSwr(url, { fetcher });
-    const crimes = data && !error ? data["results"] : [];
-    console.log('crimes', crimes)
-    const points = crimes.map(crime => ({
+    const parcels = data && !error ? data["results"] : [];
+    console.log('parcels',parcels);
+    const points = parcels.map(parcel => ({
         type: "Feature",
-        properties: { cluster: false, crimeId: crime.prop_id, category: crime.zipcode },
+        properties: { cluster: false, prop_id: parcel.prop_id, zipcode: parcel.zipcode,
+        address: parcel.address, sqft: parcel.sqft, assd_value: parcel.recorded_value,
+        estmd_value: parcel.estimated_value},
         geometry: {
             type: "Point",
             coordinates: [
-                parseFloat(crime.long),
-                parseFloat(crime.lat)
+                parseFloat(parcel.long),
+                parseFloat(parcel.lat)
             ]
         }
     }));
-    console.log('points', points);
+    console.log('points',points);
 
     const bounds = mapRef.current
         ? mapRef.current
@@ -62,6 +68,10 @@ export default function App() {
                 }}
                 ref={mapRef}
             >
+                <GeolocateControl position="top-right" />
+                <FullscreenControl/>
+                <NavigationControl position="top-right" />
+                <ScaleControl unit={'imperial'}/>
                 {clusters.map(cluster => {
                     const [longitude, latitude] = cluster.geometry.coordinates;
                     const {
@@ -82,22 +92,23 @@ export default function App() {
                                         width: `${10 + (pointCount / points.length) * 20}px`,
                                         height: `${10 + (pointCount / points.length) * 20}px`
                                     }}
-                                    onClick={() => {
-                                        const expansionZoom = Math.min(
-                                            supercluster.getClusterExpansionZoom(cluster.id),
-                                            20
-                                        );
-
-                                        setViewport({
-                                            ...viewport,
-                                            latitude,
-                                            longitude,
-                                            zoom: expansionZoom,
-                                            transitionInterpolator: new FlyToInterpolator({
-                                                speed: 2
-                                            }),
-                                            transitionDuration: "auto"
-                                        });
+                                    eventHandlers={{
+                                        click: () => {
+                                            const expansionZoom = Math.min(
+                                                supercluster.getClusterExpansionZoom(cluster.id),
+                                                20
+                                            );
+                                            setViewport({
+                                                ...viewport,
+                                                latitude,
+                                                longitude,
+                                                zoom: expansionZoom,
+                                                transitionInterpolator: new FlyToInterpolator({
+                                                    speed: 2
+                                                }),
+                                                transitionDuration: "auto"
+                                            });
+                                        }
                                     }}
                                 >
                                     {pointCount}
@@ -107,15 +118,23 @@ export default function App() {
                     }
 
                     return (
+                        <div>
                         <Marker
-                            key={`crime-${cluster.properties.crimeId}`}
+                            key={`crime-${cluster.properties.prop_id}`}
                             latitude={latitude}
                             longitude={longitude}
+                            onClick={() => {setShowPopup(true);
+                            setPopupInfo(`<h4>Address: ${cluster.properties.address} <br/>${cluster.properties.sqft} sfqt </h4>
+                                <h4>Assessed value: ${cluster.properties.assd_value}</h4>
+                                <h4>Estimated value: ${cluster.properties.estmd_value}</h4>`)}}
                         >
                             <button className="crime-marker">
                                 <img src="/warehouse.png" alt="commercial properties" />
                             </button>
                         </Marker>
+                    {showPopup && <Popup longitude={longitude} latitude={latitude}
+                    onClose={() => setShowPopup(false)}>{popupInfo}</Popup>}
+                        </div>
                     );
                 })}
             </ReactMapGL>

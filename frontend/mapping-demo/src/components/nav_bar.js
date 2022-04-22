@@ -14,7 +14,7 @@ class NavigationBar extends React.Component {
         return (
             <div className="navbar">
                 <ul>
-                    <li><a href="https://techequitycollaborative.org/" target="_blank" rel="noreferrer">[TITLE]</a></li>
+                    <li><a href="https://techequitycollaborative.org/" target="_blank" rel="noreferrer">TECH EQUITY COLLABORATIVE</a></li>
                     <li><NavLink to="/home" activeStyle={active}>HOME</NavLink></li>
                     <li><NavLink to="/about" activeStyle={active}>ABOUT</NavLink></li>
                     <li><NavLink to="/case-studies" activeStyle={active}>CASE STUDIES</NavLink></li>
