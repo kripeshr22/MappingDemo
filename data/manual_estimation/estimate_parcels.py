@@ -124,7 +124,7 @@ class Estimator:
                 continue
 
             # iterate through re-assessed years
-            # print(prop_df)
+
             for index, row in prop_df.iterrows():
                 curr_year = row[self.rebase_year]
                 curr_value = row[self.value]
@@ -172,6 +172,7 @@ class Estimator:
             growth_map = self.get_growth_map(region_df)
             growth_map = self.get_cumulative_growth(growth_map)
             growth_maps[region] = growth_map
+
         return growth_maps
 
     def get_cumulative_growth(self, growth_map): 
@@ -266,7 +267,15 @@ class Estimator:
             for _, row in region_df.iterrows():
                 prev_year = int(row[self.roll_year]) 
                 growth_factor = growth_map.get(self.current_year - 1)/growth_map.get(prev_year)
-                ain_to_est[row[self.prop_id]] = growth_factor*row[self.value]
+                est_value = growth_factor*row[self.value]
+
+                # some growth values are skewed to years of tremendous growth
+                # and are bad estimates that cause errors. Use ML model value here.
+                # limiting max land value to $1 quadrillion
+                if est_value >= 1000000000000000:
+                    ain_to_est[row[self.prop_id]] = 0
+                else:
+                    ain_to_est[row[self.prop_id]] = est_value
 
             region_df["estimated_value"] = region_df[self.prop_id].map(ain_to_est)
             region_dfs.append(region_df)
@@ -293,6 +302,10 @@ def main():
     output_tablename = "la_manual_est_table"
     df = estimator.estimate_current_parcel_values()
     print(df)
+
+    max_pred_vals = df.nlargest(10, ['estimated_value'])
+    print(max_pred_vals)
+
     df_columns = list(df)
     columns = ",".join(df_columns)
     print(columns)
