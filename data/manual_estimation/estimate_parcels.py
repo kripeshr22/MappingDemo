@@ -9,6 +9,7 @@ current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'import_scripts')
 sys.path.append(import_dir)
 import import_to_heroku
+import create_table 
 
 current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'utils')
@@ -17,8 +18,10 @@ import get_data
 
 
 
+
 class Estimator:
-    def __init__(self, county, prop_id, rebase_year, roll_year, region, lat, long, value):
+    def __init__(self, county, prop_id, rebase_year, roll_year, region, lat, long, value,
+        sqft, address):
         self.county = county
         self.prop_id = prop_id
         self.rebase_year = rebase_year
@@ -27,13 +30,21 @@ class Estimator:
         self.value = value
         self.lat = lat
         self.long = long
-        self.columns = [prop_id, rebase_year, roll_year, region, value, lat, long]
+        self.sqft = sqft
+        self.address = address
+
+        self.columns = [prop_id, rebase_year, roll_year, region, value, lat, long, 
+            sqft, address]
         self.current_year = datetime.datetime.now().year
 
     def get_df(self):
         """get df + format columns from input df: currently for la county only"""
         df = get_data.get_clean_df(self.county, self.columns)
-        df = df.apply(pd.to_numeric)
+        # df = df.apply(pd.to_numeric)
+        df[self.rebase_year] = df[self.rebase_year].astype(int)
+        df[self.roll_year] = df[self.roll_year].astype(int)
+        df[self.value] = df[self.value].astype(float)
+
         self.df = df
         return df
 
@@ -113,6 +124,7 @@ class Estimator:
                 continue
 
             # iterate through re-assessed years
+
             for index, row in prop_df.iterrows():
                 curr_year = row[self.rebase_year]
                 curr_value = row[self.value]
@@ -160,6 +172,7 @@ class Estimator:
             growth_map = self.get_growth_map(region_df)
             growth_map = self.get_cumulative_growth(growth_map)
             growth_maps[region] = growth_map
+
         return growth_maps
 
     def get_cumulative_growth(self, growth_map): 
@@ -185,7 +198,8 @@ class Estimator:
         get the most recently re-assessed row for each property 
         (rows where rollyear = lastest rebase year)
         """
-        output_cols = [self.prop_id, self.rebase_year, self.roll_year, self.value, self.long, self.lat]
+        output_cols = [self.prop_id, self.rebase_year, self.roll_year, self.value, 
+            self.long, self.lat, self.region, self.sqft, self.address]
         df = df[output_cols]
 
         # for each property, keep rows w latest reassessment year and choose oldest rollyear
@@ -209,7 +223,6 @@ class Estimator:
         idx_max_year = df.groupby(
             [self.prop_id])[self.roll_year].transform(max) == df[self.roll_year]
         df = df[idx_max_year]
-        print(df)
         return df.drop(columns=[self.roll_year])
 
 
@@ -221,12 +234,14 @@ class Estimator:
         """
         # standardize column names
         df.rename(columns={self.prop_id: 'prop_id', self.lat: 'lat', self.long: 'long',
-          self.value: 'recorded_value'}, inplace=True)
+          self.value: 'recorded_value', self.region: 'zipcode', self.address: 'address',
+          self.sqft: 'sqft'}, inplace=True)
 
         # common formatting irregularities
         df["estimated_value"] = df["estimated_value"].round(2)
         df['prop_id'] = df['prop_id'].astype(
             str).apply(lambda x: x.replace('.0', ''))
+
 
         # add missing cols
         df['value_diff'] = df['recorded_value'] - df['estimated_value']
@@ -252,18 +267,28 @@ class Estimator:
             for _, row in region_df.iterrows():
                 prev_year = int(row[self.roll_year]) 
                 growth_factor = growth_map.get(self.current_year - 1)/growth_map.get(prev_year)
-                ain_to_est[row[self.prop_id]] = growth_factor*row[self.value]
+                est_value = growth_factor*row[self.value]
+
+                # some growth values are skewed to years of tremendous growth
+                # and are bad estimates that cause errors. Use ML model value here.
+                # limiting max land value to $1 quadrillion
+                if est_value >= 1000000000000000:
+                    ain_to_est[row[self.prop_id]] = 0
+                else:
+                    ain_to_est[row[self.prop_id]] = est_value
 
             region_df["estimated_value"] = region_df[self.prop_id].map(ain_to_est)
             region_dfs.append(region_df)
         
         est_df = pd.concat(region_dfs)
+        print(f'est df is {est_df}')
         est_df = est_df.drop(columns=[self.value, self.roll_year, self.rebase_year])
 
         recorded_val_df = self.get_recorded_value(self.df)
+        print(f'recorded_val df is {recorded_val_df}')
+
         output_df = pd.merge(est_df, recorded_val_df, how='inner', on=self.prop_id)
         output_df = self.format_output_df(output_df)
-        print(output_df)
 
         return output_df
 
@@ -271,13 +296,23 @@ def main():
     sys.stdout = open('manual_estimation/console.txt', 'w')
 
     args = {'county': "la", 'prop_id': "ain", 'rebase_year': "landbaseyear", 'roll_year': "rollyear",
-            'value': "totalvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon'}
+            'value': "landvalue", 'region': "zipcode5", 'lat': 'center_lat', 'long': 'center_lon',
+            'sqft': 'sqftmain', 'address': 'propertylocation'}
     estimator = Estimator(**args)
-    tablename = "la_manual_est_table"
+    output_tablename = "la_manual_est_table"
     df = estimator.estimate_current_parcel_values()
+    print(df)
+
+    max_pred_vals = df.nlargest(10, ['estimated_value'])
+    print(max_pred_vals)
+
+    df_columns = list(df)
+    columns = ",".join(df_columns)
+    print(columns)
 
     # write table to heroku
-    import_to_heroku.create_and_insert_df(df, tablename)
+    import_to_heroku.create_and_insert_df(
+        df, output_tablename, create_table.la_manual_est_table)
 
     sys.stdout.close()
 
