@@ -1,6 +1,7 @@
 import os, sys
 import pandas as pd
 import numpy as np
+from sklearn.metrics import mean_squared_error
 
 current_dir = os.path.dirname(__file__)
 import_dir = os.path.join(current_dir, '..', 'utils')
@@ -41,5 +42,12 @@ def find_error_rf():
 
     # Calculate the absolute error for each property
     df2021['abs_err'] = abs(df2021['recorded_value']-df2021['estimated_value'])
+    # Calculate the average relative error
     mean_rel_err = df2021['abs_err'].sum()/df2021['recorded_value'].sum()
-    print(mean_rel_err) # Result is 22.9%
+    print('Average Relative Error: ',mean_rel_err) # Result is 22.9%
+    # Calculate RMSE
+    rmse = mean_squared_error(df2021['recorded_value'], df2021['estimated_value'], squared = False)
+    print('RMSE: ',rmse)
+    # Calculate mean of 2021 property values
+    mean_val = df2021['recorded_value'].mean()
+    print('Mean Land Value: ', mean_val)
