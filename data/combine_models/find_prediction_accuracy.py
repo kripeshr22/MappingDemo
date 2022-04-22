@@ -7,25 +7,39 @@ import_dir = os.path.join(current_dir, '..', 'utils')
 sys.path.append(import_dir)
 import get_data
 
-BY_ZIPCODE = False # Boolean value which determines which table the function calculates the error for
-
-def main():
+def find_error_finalpreds(by_zipcode = True):
     ''' 
-    find_prediction_accuracy.py finds the average relative error for a given final 
+    find_error_finalpreds finds the average relative error for a given final 
     estimation table (either la_final_est_byzipcode or la_final_est_byquantile)
+    by_zipcode is a bool which determines which table the function calculates the error for
     '''
-    if BY_ZIPCODE:
+    if by_zipcode:
         tablename = 'la_final_est_byzipcode'
     else:
         tablename = 'la_final_est_byquantile'
-    cols = ['recorded_value','estimated_value','assessedin2021']
+    cols = ['prop_id','recorded_value','estimated_value','assessedin2021']
     df = get_data.get_df_from_heroku(tablename, cols)
     df2021 = df[df['assessedin2021']==True].copy()
 
     # Calculate the absolute error for each property
     df2021['abs_err'] = abs(df2021['recorded_value']-df2021['estimated_value'])
     mean_rel_err = df2021['abs_err'].sum()/df2021['recorded_value'].sum()
-    print(mean_rel_err)
+    print(mean_rel_err) # Result: byzipcode- 0.69%; byquantile - 0.78%
 
-if __name__ == "__main__":
-    main()
+def find_error_rf():
+    ''' find_error_rf finds the average relative error for la_rf_est_table
+    '''
+    df_zc = get_data.get_df_from_heroku('la_final_est_byzipcode', ['prop_id','recorded_value','assessedin2021'])
+    df_rf = get_data.get_df_from_heroku('la_rf_est_table', ['prop_id', 'estimated_value'])
+    df = df_zc.merge(df_rf, how='outer', on='prop_id')
+    df2021 = df[df['assessedin2021']==True].copy()
+
+    # Convert estimated_value to a numeric type so we can do calculations with it
+    df2021['estimated_value'] = df2021['estimated_value'].str.replace(',','')
+    df2021['estimated_value'] = df2021['estimated_value'].str.replace('\$','')
+    df2021['estimated_value'] = pd.to_numeric(df2021['estimated_value'])
+
+    # Calculate the absolute error for each property
+    df2021['abs_err'] = abs(df2021['recorded_value']-df2021['estimated_value'])
+    mean_rel_err = df2021['abs_err'].sum()/df2021['recorded_value'].sum()
+    print(mean_rel_err) # Result is 22.9%
