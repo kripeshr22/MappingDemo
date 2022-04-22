@@ -26,7 +26,7 @@ def main():
         combineddf = compare_error_by_quantile(comparisondf)
 
     # Upload df to Heroku
-    #upload_to_heroku(combineddf)
+    upload_to_heroku(combineddf)
 
 def create_comparisondf():
     ''' create_comparisondf pulls data from la_manual_est_table and la_rf_est_table to 
@@ -39,7 +39,6 @@ def create_comparisondf():
     manual_df = get_data.get_df_from_heroku('la_manual_est_table')
     rf_df = get_data.get_df_from_heroku('la_rf_est_table')
     assessedin2021_df = get_data.get_2021_df('cleanlacountytable', ['ain', 'landbaseyear'])
-    print('Finished fetching data')
 
     # Make comparisondf
     comparisondf = pd.merge(manual_df, rf_df, how='outer', on='prop_id')
@@ -54,7 +53,6 @@ def create_comparisondf():
         comparisondf[col] = comparisondf[col].str.replace('\$','')
         comparisondf[col] = pd.to_numeric(comparisondf[col])
 
-    print('created comparisondf')
     return comparisondf
 
 def compare_error_by_zipcode(df):
@@ -90,7 +88,6 @@ def compare_error_by_zipcode(df):
     combineddf = df[['prop_id','lat','long','zipcode','sqft','address','recorded_value','estimated_value','assessedin2021','is_manualest', 'rmse_byzipcode']].copy()
     overall_rmse = mean_squared_error(df.loc[df['assessedin2021'] == True, ['recorded_value']],df.loc[df['assessedin2021'] == True, ['estimated_value']], squared=False)
     mean_2021rv = df.loc[df['assessedin2021'] == True, 'recorded_value'].mean()
-    print('finished combining data')
     print('overall rmse: ', overall_rmse)
     print('mean recorded_value for properties assessed in 2021: ', mean_2021rv)
 
@@ -129,23 +126,25 @@ def compare_error_by_quantile(df):
     combineddf = df[['prop_id','lat','long','zipcode','sqft','address','recorded_value','estimated_value','assessedin2021','is_manualest', 'rmse_byquantile']].copy()
     overall_rmse = mean_squared_error(df.loc[df['assessedin2021'] == True, ['recorded_value']],df.loc[df['assessedin2021'] == True, ['estimated_value']], squared=False)
     mean_2021rv = df.loc[df['assessedin2021'] == True, 'recorded_value'].mean()
-    print('finished combining data')
     print('overall rmse: ', overall_rmse)
     print('mean recorded_value for properties assessed in 2021: ', mean_2021rv)
 
     return combineddf
 
-
 def upload_to_heroku(df):
-    #TODO: Fix uploading issues
-    # Handle common formatting irregularities
-    df["estimated_value"] = df["estimated_value"].astype('int')
-
+    # Handle common formatting irregularities and errors in inserting into table
+    df["estimated_value"] = df["estimated_value"].round(2)
+    df["assessedin2021"] = df["assessedin2021"].astype(int)
+    df["assessedin2021"] = df["assessedin2021"].astype('boolean')
+    df["is_manualest"] = df["is_manualest"].fillna(False)
+    
     # Upload
     if BY_ZIPCODE:
         import_to_heroku.create_and_insert_df(df, 'la_final_est_byzipcode')
-        print('uploaded final estimations to la_final_est_byzipcode')
+        print('Uploaded final estimations to la_final_est_byzipcode')
     else:
         import_to_heroku.create_and_insert_df(df, 'la_final_est_byquantile')
-        print('uploaded final estimations to la_final_est_byquantile')
-    
+        print('Uploaded final estimations to la_final_est_byquantile')
+
+if __name__ == "__main__":
+    main()

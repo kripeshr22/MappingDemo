@@ -94,3 +94,6 @@ def corr_matrix(df):
     fig, ax = plt.subplots(figsize=(15, 12))
     sns.heatmap(corr_matrix, vmax=0.8, square=True)
     plt.show()
+
+if __name__ == "__main__":
+    main()

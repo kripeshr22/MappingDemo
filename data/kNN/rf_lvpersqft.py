@@ -21,8 +21,7 @@ import encode_zipcode
 
 def main():
     # Create dataframes
-    # select_cols = ['ain','center_lat', 'center_lon', 'propertyusecode', 'sqftmain', 'landbaseyear', 'landvalue']
-    select_cols = ['ain','center_lat', 'center_lon', 'sqftmain', 'landbaseyear', 'landvalue', 'zipcode5']
+    select_cols = ['ain','center_lat', 'center_lon', 'sqftmain', 'landbaseyear', 'landvalue']
 
     # train_df, est_df = encode_zipcode.main(select_cols = select_cols)
     train_df = get_data.get_past4y_df('cleanlacountytable', select_cols)
@@ -49,25 +48,11 @@ def main():
     make_plot(y_test2021, y_pred2021)
 
     # Create output df and upload to Heroku
-    outputdf = format_output_df(est_df)
-    import_to_heroku.create_and_insert_df(outputdf, 'la_rf_est_table')
-    print('imported data into Heroku database in table la_rf_est_table')
-    
+    # outputdf = format_output_df(est_df)
+    # import_to_heroku.create_and_insert_df(outputdf, 'la_rf_est_table')    
 
 def organize_data(df):
-    # Create a new column for each character in propertyusecode and turn any letters into numbers
-    # lettersToNumbers = {"A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15, "G": 16,
-    #                 "H": 17, "I": 18, "J": 19, "K": 20, "L": 21, "M": 22, "N": 23,
-    #                 "O": 24, "P": 25, "Q": 26, "R": 27, "S": 28, "T": 29, "U": 30,
-    #                 "V": 31, "W": 32, "X": 33, "Y": 34, "Z": 35, " ": 36, "*": 37}
-    # df['usecode1'] = df['propertyusecode'].astype(str).str[0]
-    # df['usecode2'] = df['propertyusecode'].astype(str).str[1]
-    # df['usecode3'] = df['propertyusecode'].astype(str).str[2]
-    # df['usecode4'] = df['propertyusecode'].astype(str).str[3]
-    # for col in ['usecode1', 'usecode2', 'usecode3', 'usecode4']:
-    #     for x in lettersToNumbers:
-    #         df[col] = df[col].replace(x,lettersToNumbers[x])
-    # df.drop('propertyusecode', axis=1, inplace=True)
+
     df = df.set_index('ain')
 
     for col in df:
@@ -75,8 +60,7 @@ def organize_data(df):
         df= df[df[col]!= ''] 
         
         # Change data type to int and float
-        if col != 'propertyusecode':
-            df[col] = pd.to_numeric(df[col], downcast='integer')
+        df[col] = pd.to_numeric(df[col], downcast='integer')
 
     # Remove any row where any value is inf or nan
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -88,7 +72,6 @@ def organize_data(df):
     df= df[df['sqftmain'] != 0]
     df= df[df['landvaluepersqft'] < 800]
    
-    print('finished cleaning data')
     return df
 
 def create_ml_model(df, est_df):
@@ -98,7 +81,6 @@ def create_ml_model(df, est_df):
     df_test2021 = df_test[df_test['landbaseyear'] == 2021]
 
     #--- Set independent and dependent variables ---#
-    print('setting X and y')
 
     y_train = df_train['landvaluepersqft']
     X_train = df_train.drop(['landvaluepersqft', 'landbaseyear'], axis=1)
@@ -107,9 +89,8 @@ def create_ml_model(df, est_df):
     y_test2021 = df_test2021['landvaluepersqft']
     X_test2021 = df_test2021.drop(['landvaluepersqft', 'landbaseyear'], axis=1)
     X_est = est_df.drop(['landvaluepersqft'], axis=1)
-    #import ipdb; ipdb.set_trace()
+
     # Create ML Model
-    print('starting machine learning now')
     model = RandomForestRegressor(random_state= 42)
     model.fit(X_train,y_train)
 
@@ -127,7 +108,6 @@ def create_ml_model(df, est_df):
 
 def make_plot(y, ypred):
     # Create a plot for errors vs landvaluepersqft 
-    print('creating plot now')
     errors = y - ypred  
     plt.figure()
     plt.scatter(y, errors)
@@ -154,3 +134,6 @@ def format_output_df(df):
     outputdf["estimated_value"] = outputdf["estimated_value"].round(2)
     outputdf['prop_id'] = outputdf['prop_id'].astype(str).apply(lambda x: x.replace('.0', ''))
     return outputdf
+
+if __name__ == "__main__":
+    main()

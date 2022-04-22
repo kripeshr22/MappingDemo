@@ -433,10 +433,11 @@ la_final_est_byzipcode = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byzip
         zipcode VARCHAR, \
         sqft INT, \
         address VARCHAR, \
-        recorded_value MONEY, \
-        estimated_value MONEY, \
-        assessedin2021 BOOL, \
-        is_manualest BOOL \
+        recorded_value FLOAT4, \
+        estimated_value FLOAT4, \
+        assessedin2021 BOOLEAN, \
+        is_manualest BOOLEAN, \
+        rmse_byzipcode FLOAT4 \
 )"
 
 la_final_est_byquantile = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byquantile ( \
@@ -446,8 +447,9 @@ la_final_est_byquantile = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byqu
         zipcode VARCHAR, \
         sqft INT, \
         address VARCHAR, \
-        recorded_value MONEY, \
-        estimated_value MONEY, \
-        assessedin2021 BOOL, \
-        is_manualest BOOL \
+        recorded_value FLOAT4, \
+        estimated_value FLOAT4, \
+        assessedin2021 BOOLEAN, \
+        is_manualest BOOLEAN, \
+        rmse_byquantile FLOAT4 \
 )"
