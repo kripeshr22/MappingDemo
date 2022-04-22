@@ -129,7 +129,7 @@ def import_from_api_to_heroku(county_name, tablename, primary_key, fields,
             conn.close()
             print("Connection closed.")
 
-def create_and_insert_df(df, tablename):
+def create_and_insert_df(df, tablename, insert_query):
     if len(df) < 1:
         return
 
@@ -143,7 +143,7 @@ def create_and_insert_df(df, tablename):
 
     # create table/rewrite it if it exists
     cur.execute("DROP TABLE IF EXISTS " + tablename)
-    cur.execute(la_final_est_byquantile)
+    cur.execute(insert_query)
     conn.commit()
 
     try:
