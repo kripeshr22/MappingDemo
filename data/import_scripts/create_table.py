@@ -426,6 +426,33 @@ la_rf_est_table = "CREATE UNLOGGED TABLE IF NOT EXISTS la_rf_est_table ( \
         prop_id VARCHAR, \
         lat VARCHAR, \
         long VARCHAR, \
-        estimated_value MONEY, \
-        sqft INT \
+        estimated_value MONEY \
+)"
+
+la_final_est_byzipcode = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byzipcode ( \
+        prop_id VARCHAR, \
+        lat VARCHAR, \
+        long VARCHAR, \
+        zipcode VARCHAR, \
+        sqft INT, \
+        address VARCHAR, \
+        recorded_value FLOAT4, \
+        estimated_value FLOAT4, \
+        assessedin2021 BOOLEAN, \
+        is_manualest BOOLEAN, \
+        rmse_byzipcode FLOAT4 \
+)"
+
+la_final_est_byquantile = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byquantile ( \
+        prop_id VARCHAR, \
+        lat VARCHAR, \
+        long VARCHAR, \
+        zipcode VARCHAR, \
+        sqft INT, \
+        address VARCHAR, \
+        recorded_value FLOAT4, \
+        estimated_value FLOAT4, \
+        assessedin2021 BOOLEAN, \
+        is_manualest BOOLEAN, \
+        rmse_byquantile FLOAT4 \
 )"

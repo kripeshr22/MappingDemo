@@ -4,7 +4,7 @@ import psycopg2 as pg
 import psycopg2.extras
 from create_table import raw_socrata_table_schema_la, \
     all_fields_socrata_la, raw_socrata_table_schema_sf, all_fields_socrata_sf, \
-        la_manual_est_table, la_rf_est_table
+        la_manual_est_table, la_rf_est_table, la_final_est_byzipcode, la_final_est_byquantile
 from sodapy import Socrata
 import os
 import sys
