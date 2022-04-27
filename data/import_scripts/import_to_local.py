@@ -1,4 +1,6 @@
-import psycopg2
+
+import psycopg2 as pg
+import psycopg2.extras
 from create_table import create_table_query_2, fields_2
 import os
 from sodapy import Socrata
@@ -10,14 +12,16 @@ def main():
     tablename = "svr_table_2"
     create_table_query = create_table_query_2
     fields = fields_2
+    primary_key = "ain"
 
-    import_to_table(database, tablename, fields, create_table_query)
+    import_to_table(fields, database, tablename, primary_key, create_table_query)
+
 
 
 # ***** connect to the db *******
 def connect_to_db(database, user, password):
     try:
-        conn = psycopg2.connect(database=database, user=user, password=password)
+        conn = pg.connect(database=database, user=user, password=password)
         print("successfully connected to database")
     except:
         print("I am unable to connect to the database")
@@ -25,10 +29,10 @@ def connect_to_db(database, user, password):
     # cursor
     return conn
 
-    
+   
+def import_to_table(fields, database, tablename, primary_key, create_table_query="", rewrite_table=False):
 
-def import_to_table(database, tablename, fields, create_table_query):
-
+    # for setting env variables (USER & PASSWORD): https://askubuntu.com/questions/58814/how-do-i-add-environment-variables
     conn = connect_to_db(database, os.getenv(
         "USER"), os.getenv("PASSWORD"))
     cur = conn.cursor()
@@ -41,54 +45,67 @@ def import_to_table(database, tablename, fields, create_table_query):
         timeout=1000
     )
 
-    # uncomment the following line if schema has been updated:
-    # cur.execute("DROP TABLE IF EXISTS rawParcelTable")
-
-    # rewriting entire table for now
-    cur.execute("DROP TABLE IF EXISTS " + tablename)
-    cur.execute(create_table_query)
-    print("created table. connecting to api")
+    # rewriting entire table
+    if rewrite_table:
+        cur.execute("DROP TABLE IF EXISTS " + tablename)
+        cur.execute(create_table_query)
+        conn.commit()
+        print("created table. connecting to api")
 
     cols_as_string = ", ".join(fields)
-    data_generator = client.get('9trm-uz8i', select="distinct " + cols_as_string,
-                                    usecodedescchar1="Commercial", istaxableparcel="Y", 
-                                    limit=50000)
 
-    print("successfully got data generator from api endpoint")
+    insert_query = "INSERT INTO " + tablename + " VALUES %s ON CONFLICT DO NOTHING;"
 
-    num_fields = len(fields)
-    format = "(%s)" if num_fields == 1 else "(%s" + ",%s" * (num_fields - 1) + ")"
+    num_records = client.get_all('9trm-uz8i', select="count(*)")
+    num_records = int(next(num_records).get("count"))
+    print("Total of ", num_records, " to import")
 
-    for row in data_generator:
-        # insert into table
-        my_data = [row.get(field, "") for field in fields]
-        insert_query = "INSERT INTO " + tablename + " VALUES " + format + " ON CONFLICT DO NOTHING"
+    offset = 0
+    limit = 25000
 
-        # -- uncomment line to show error message --
-        cur.execute(insert_query, tuple(my_data))
+    try:
+        print("Inserting data")
 
-        # -- show problem row, prevent error message --
-        # try:
-        #     cur.execute(insert_query, tuple(my_data))
-        # except:
-        #     print(my_data)
-        #     break
+        while(offset < num_records):
+            data_generator = client.get('9trm-uz8i', select="distinct " + cols_as_string,
+                                            usecodedescchar1="Commercial", istaxableparcel="Y",
+                                            order=primary_key + " DESC", limit=limit, offset=offset)
 
-    print("further cleaning the data")
-    cur.execute("UPDATE " + tablename + " SET sqftmain = REPLACE(sqftmain, ',', '')")
-    cur.execute(
-        "UPDATE " + tablename + " SET roll_landvalue = REPLACE(roll_landvalue, ',', '')")
-    cur.execute("DELETE FROM " + tablename + " WHERE center_lon = '0'")
-    cur.execute("DELETE FROM " + tablename + " WHERE center_lat = '0'")
-    cur.execute("DELETE FROM " + tablename + " WHERE roll_landbaseyear = '0'")
-    conn.commit()
+            psycopg2.extras.execute_values(
+                cur,
+                insert_query,
+                [tuple([data.get(f, "") for f in fields])
+                for data in data_generator]
+            )
 
-    print("closing cursor and connection")
-    # close the cursor
-    cur.close()
+            conn.commit()
+            offset = offset + limit
+            print("offset is ", offset)
 
-    # close the connection
-    conn.close()
+    except (Exception, pg.Error) as e:
+            print(e)
+    finally:
+        if (conn):
+            cur.close()
+            conn.close()
+            print("Inserted data into table. Connection closed.")
+
+    # print("further cleaning the data")
+    # cur.execute("UPDATE " + tablename + " SET sqftmain = REPLACE(sqftmain, ',', '')")
+    # cur.execute(
+    #     "UPDATE " + tablename + " SET roll_landvalue = REPLACE(roll_landvalue, ',', '')")
+    # cur.execute("DELETE FROM " + tablename + " WHERE center_lon = '0'")
+    # cur.execute("DELETE FROM " + tablename + " WHERE center_lat = '0'")
+    # cur.execute("DELETE FROM " + tablename + " WHERE roll_landbaseyear = '0'")
+    # conn.commit()
+
+    # print("closing cursor and connection")
+    # # close the cursor
+    # cur.close()
+
+    # # close the connection
+    # conn.close()
+
 
 
 
