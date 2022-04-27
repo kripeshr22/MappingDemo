@@ -1,3 +1,4 @@
+
 import psycopg2 as pg
 import psycopg2.extras
 from create_table import create_table_query_2, fields_2
@@ -16,6 +17,7 @@ def main():
     import_to_table(fields, database, tablename, primary_key, create_table_query)
 
 
+
 # ***** connect to the db *******
 def connect_to_db(database, user, password):
     try:
@@ -27,7 +29,7 @@ def connect_to_db(database, user, password):
     # cursor
     return conn
 
-    
+   
 def import_to_table(fields, database, tablename, primary_key, create_table_query="", rewrite_table=False):
 
     # for setting env variables (USER & PASSWORD): https://askubuntu.com/questions/58814/how-do-i-add-environment-variables
@@ -103,6 +105,7 @@ def import_to_table(fields, database, tablename, primary_key, create_table_query
 
     # # close the connection
     # conn.close()
+
 
 
 

@@ -14,5 +14,6 @@ Contributors:
 ## How to install this repo and run it on your local device
 1. [Install NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 2. Clone this repo: `git clone https://github.com/kripeshr22/MappingDemo.git`
-3. Run `npm install`
-4. Run `npm start`
+3. Run `cd frontend`
+4. Run `npm install`
+5. Run `npm run dev`

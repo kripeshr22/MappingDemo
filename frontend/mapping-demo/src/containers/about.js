@@ -15,7 +15,7 @@ const About = () => {
                 <li><a href="https://github.com/kripeshr22" class="answer" target='_blank' rel="noreferrer">Kripesh Ranabhat</a></li>
                 <li><a href="https://github.com/yurynamgung" class="answer" target='_blank' rel="noreferrer">Yury Namgung</a></li></p>
             <br/>
-            <a href="https://github.com/kripeshr22/MappingDemo" target='_blank' rel="noreferrer">GITHUB</a>
+            <a href="https://github.com/kripeshr22/MappingDemo" className={'link'} target='_blank' rel="noreferrer">GITHUB</a>
             </div>
         </div>
     )}
