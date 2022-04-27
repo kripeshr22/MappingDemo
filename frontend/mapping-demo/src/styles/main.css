@@ -1,6 +1,6 @@
 body {
     font-family: sans-serif;
-    background-color: #131313;
+    background-color: #EFBABA;
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
@@ -9,6 +9,8 @@ body {
 a {
     text-align: center;
     color: #1FB264;
+    font-weight: bolder;
+    font-size: larger;
 }
 
 img {

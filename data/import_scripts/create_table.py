@@ -456,3 +456,4 @@ la_final_est_byquantile = "CREATE UNLOGGED TABLE IF NOT EXISTS la_final_est_byqu
         is_manualest BOOLEAN, \
         rmse_byquantile FLOAT4 \
 )"
+
